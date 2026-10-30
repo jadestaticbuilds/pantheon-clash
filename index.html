@@ -15,19 +15,21 @@
   --nor1:#c7cfda; --nor2:#4c5866;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-html,body{margin:0;padding:0;background:var(--bg0);color:var(--ink);
+html,body{margin:0;padding:0;background:#020306;color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  min-height:100vh;}
-body{overflow-x:hidden;}
-#dust{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.7;}
+  height:100%;}
+body{overflow:hidden;height:100dvh;overscroll-behavior:none;}
+#mkbg{position:fixed;inset:0;z-index:0;pointer-events:none;}
+#vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse 125% 105% at 50% 38%, transparent 52%, rgba(0,0,0,.62) 100%);}
 #burst{position:fixed;inset:0;z-index:60;pointer-events:none;display:none;}
-#app{position:relative;z-index:1;max-width:520px;margin:0 auto;min-height:100vh;
-  padding:12px 12px 32px;}
+#app{position:relative;z-index:2;max-width:520px;margin:0 auto;height:100dvh;max-height:100dvh;
+  overflow:hidden;padding:10px 10px 12px;}
 #app.shake{animation:shk .45s;}
 @keyframes shk{0%,100%{transform:translate(0,0)}20%{transform:translate(-7px,4px)}
   40%{transform:translate(6px,-5px)}60%{transform:translate(-5px,-3px)}80%{transform:translate(4px,3px)}}
 section{display:none;}
-section.on{display:block;animation:fadein .35s;}
+section.on{display:block;height:100%;overflow:hidden;animation:fadein .35s;}
 @keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 h1.title{font-family:Georgia,"Times New Roman",serif;font-size:44px;margin:26px 0 4px;
   text-align:center;letter-spacing:2px;
@@ -211,10 +213,70 @@ details.howto li{margin:6px 0;}
   100%{opacity:0;transform:translate(-50%,-64px) scale(1)}}
 #roundmsg{text-align:center;font-family:Georgia,serif;font-size:19px;color:var(--gold2);
   margin:10px 0;min-height:28px;}
-#battlelog{list-style:none;margin:10px 0 0;padding:0;max-height:150px;overflow-y:auto;
-  font-size:12.5px;color:var(--ink-dim);}
-#battlelog li{padding:5px 10px;border-bottom:1px solid #141b2e;}
-#battlelog li b{color:var(--ink);}
+/* no-scroll arena layout: the whole match fits 100dvh */
+#scr-battle{position:relative;}
+#scr-battle.on{display:flex;flex-direction:column;height:100%;overflow:hidden;gap:5px;}
+.hudrow{display:flex;align-items:center;gap:8px;flex:none;}
+.hudrow .nm{font-family:Georgia,serif;font-size:12px;letter-spacing:1px;color:var(--gold2);white-space:nowrap;}
+.hudrow .nm.dim{color:var(--ink-dim);font-size:11px;}
+.hudrow .lifebar{flex:1;margin:0;height:22px;}
+.hudrow .lifebar .num{font-size:12px;}
+.eback-row{margin:0;flex:none;}
+.eback{max-width:44px;aspect-ratio:3/3.4;font-size:15px;border-width:1.5px;}
+.arena-strip.slim{margin:0;padding:5px 10px;gap:8px;flex:none;}
+.arena-strip.slim .ag{font-size:20px;}
+.arena-strip.slim .an{font-size:13px;}
+.arena-strip.slim .ad{display:none;}
+.bmid{display:flex;align-items:center;justify-content:center;gap:10px;flex:none;}
+.bmid .pips{margin:0;gap:5px;}
+.bmid .pip{width:24px;height:24px;font-size:10px;border-width:1.5px;}
+.bmid #roundmsg{margin:0;font-size:14px;min-height:0;}
+#stage{flex:1 1 auto;min-height:0;margin:0;overflow:hidden;position:relative;}
+#stage .fighters{height:100%;align-items:center;}
+#stage .fighter .portrait{height:clamp(64px,13dvh,110px);}
+#stage .fighter .plx .pglyph{font-size:clamp(34px,7dvh,54px);}
+#stage .totals{margin-top:6px;}
+#stage .total-box{padding:4px;}
+#stage .total-box .tn{font-size:20px;}
+#logticker{flex:none;font-size:11.5px;color:var(--ink-dim);white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;min-height:17px;text-align:center;}
+#logticker b{color:var(--ink);}
+#sight-zone:empty,#use-row:empty{display:none;}
+#sight-zone .sight-banner{margin:2px 0;padding:7px 10px;font-size:12px;}
+.use-row{margin:0;flex:none;}
+.use-row .btn{min-height:44px;font-size:13px;margin:0;}
+#detail{position:absolute;left:10px;right:10px;bottom:178px;z-index:25;margin:0;
+  padding:8px;border:1px solid var(--gold-dim);border-radius:12px;
+  background:linear-gradient(180deg,#141b30,#0a0f1c);display:none;
+  box-shadow:0 10px 30px rgba(0,0,0,.7);}
+#detail.on{display:block;}
+#detail .dwrap{display:flex;gap:10px;align-items:stretch;}
+#detail .card{width:118px;flex:none;}
+#detail .card .pab{display:block;min-height:0;font-size:10px;}
+#detail .portrait{height:66px;}
+#detail .dinfo{flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0;}
+#detail .dtotal{font-size:12px;color:var(--ink-dim);margin-bottom:6px;line-height:1.5;}
+#detail .dtotal b{color:var(--gold2);font-size:18px;}
+#detail .btn{min-height:48px;font-size:15px;margin:0;}
+.hand.battle{grid-template-columns:repeat(5,1fr);gap:6px;margin:0;flex:none;}
+.hand.battle .card{cursor:pointer;}
+.hand.battle .card-in{padding:6px 4px;}
+.hand.battle .portrait{height:52px;margin:0 0 3px;}
+.hand.battle .plx .pglyph{font-size:26px;}
+.hand.battle .pname{font-size:10px;margin-top:1px;}
+.hand.battle .ppanth{display:none;}
+.hand.battle .prow{gap:4px;margin-top:3px;}
+.hand.battle .ppow{width:26px;height:26px;font-size:14px;border-width:1.5px;}
+.hand.battle .ptrait{font-size:9px;padding:2px 6px;}
+.hand.battle .card .pab{display:none;}
+.hand.battle .frame-glyph{display:none;}
+.hand.battle .card.sel{outline:2px solid var(--gold2);outline-offset:1px;transform:translateY(-8px);
+  box-shadow:0 0 16px rgba(232,182,76,.55);}
+/* rendered god art inside the portrait, under the holo foil + parallax */
+.plx .pgod{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  animation:breathe 9s ease-in-out infinite;}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+.hand .card .patron-crown{font-size:16px;top:-9px;}
 .sight-banner{background:#101b33;border:1px solid #3f6fb5;border-radius:10px;padding:10px 12px;
   margin:8px 0;font-size:13.5px;color:#a9cdf0;text-align:center;}
 .use-row{display:flex;gap:8px;margin:8px 0;}
@@ -240,11 +302,14 @@ details.howto li{margin:6px 0;}
   .sudden{animation:none;}
   .portrait,.pfoil,.pspark,.prays{animation:none;}
   .pfoil{opacity:.35;transform:none;}
+  .plx .pgod{animation:none;}
+  .hand.battle .card.sel{transform:none;}
 }
 </style>
 </head>
 <body>
-<canvas id="dust"></canvas>
+<canvas id="mkbg"></canvas>
+<div id="vignette"></div>
 <canvas id="burst"></canvas>
 <div id="app">
 
@@ -282,26 +347,20 @@ details.howto li{margin:6px 0;}
   </section>
 
   <section id="scr-battle">
-    <div class="side-label">
-      <span class="nm">RIVAL GODS</span><span class="nm" id="foe-patron-lbl"></span>
-    </div>
-    <div class="lifebar foe"><div class="fill" id="foe-fill"></div><div class="num" id="foe-num">25</div></div>
+    <div class="hudrow"><span class="nm">RIVAL</span><span class="nm dim" id="foe-patron-lbl"></span>
+      <div class="lifebar foe"><div class="fill" id="foe-fill"></div><div class="num" id="foe-num">25</div></div></div>
     <div class="eback-row" id="foe-hand"></div>
-    <div class="patron-mini" id="foe-patron"></div>
-    <div class="arena-strip" id="arena-strip"></div>
-    <div class="pips" id="pips"></div>
-    <div id="roundmsg"></div>
+    <div class="arena-strip slim" id="arena-strip"></div>
+    <div class="bmid"><div class="pips" id="pips"></div><div id="roundmsg"></div></div>
     <div id="stage"></div>
+    <div id="logticker" aria-live="polite"></div>
     <div id="sight-zone"></div>
     <div class="use-row" id="use-row"></div>
-    <div class="patron-mini" id="me-patron"></div>
-    <div class="side-label">
-      <span class="nm">YOU</span><span class="nm" id="me-round-lbl">ROUND 1 OF 5</span>
-    </div>
-    <div class="lifebar me"><div class="fill" id="me-fill"></div><div class="num" id="me-num">25</div></div>
+    <div class="hudrow"><span class="nm">YOU</span><span class="nm dim" id="me-patron-lbl"></span><span class="nm dim" id="me-round-lbl">ROUND 1 OF 5</span>
+      <div class="lifebar me"><div class="fill" id="me-fill"></div><div class="num" id="me-num">25</div></div></div>
     <div id="detail"></div>
-    <div class="hand" id="me-hand"></div>
-    <ul id="battlelog"></ul>
+    <div class="hand battle" id="me-hand"></div>
+    <div style="display:none"><div id="foe-patron"></div><div id="me-patron"></div></div>
   </section>
 
   <section id="scr-end">
@@ -514,7 +573,8 @@ function cardHTML(g,extra){
  '<div class="portrait '+g.pantheon+'">'+
  '<div class="plx" data-d="6"><div class="pback"></div></div>'+
  '<div class="plx" data-d="3"><div class="prays"></div></div>'+
- '<div class="plx" data-d="11"><div class="pglyph">'+g.glyph+'</div></div>'+
+ '<div class="plx" data-d="11"><div class="pglyph">'+g.glyph+'</div>'+
+ '<img class="pgod" src="gods/'+g.id+'.webp" alt="'+esc(g.name)+'" loading="lazy" draggable="false" onerror="this.remove()"></div>'+
  '<div class="pspark s1"></div><div class="pspark s2"></div>'+
  '<div class="pfoil"></div></div>'+
  '<div class="pname">'+esc(g.name)+'</div>'+
@@ -528,7 +588,7 @@ function aCtx(){return{patronTrait:M.aiPatron,arena:M.arena,life:M.aiLife,foeLif
 function possibleSet(){
  return GODS.filter(g=>M.aiHand.indexOf(g)<0&&M.aiPlayed.indexOf(g)<0&&M.playerPlayed.indexOf(g)<0);
 }
-function log(html){const li=document.createElement('li');li.innerHTML=html;const ul=$('battlelog');ul.insertBefore(li,ul.firstChild);}
+function log(html){$('logticker').innerHTML=html;}
 function refreshBars(){
  $('me-fill').style.width=Math.max(0,M.playerLife/25*100)+'%';
  $('foe-fill').style.width=Math.max(0,M.aiLife/25*100)+'%';
@@ -589,6 +649,7 @@ function crownPatron(){
  const ag=M.aiHand.find(x=>x.trait===at);
  M.aiPatronGod=ag;M.aiHand=M.aiHand.filter(x=>x.id!==ag.id);
  const a=ARENAS[M.arena];
+ mkArena=M.arena;
  $('arena-reveal').innerHTML='<div class="arena-strip '+M.arena+'" style="margin:18px 0;">'+
   '<div class="ag" style="font-size:44px;">'+a.glyph+'</div>'+
   '<div><div class="an" style="font-size:22px;">'+a.name+'</div><div class="ad">'+a.desc+'</div></div></div>'+
@@ -598,11 +659,13 @@ function crownPatron(){
 
 /* ---------- battle ---------- */
 function beginBattle(){
- $('battlelog').innerHTML='';M.results=[];
+ $('logticker').innerHTML='';M.results=[];
  renderArenaStrip();renderPips();refreshBars();renderFoeHand();
  patronMini('me-patron',M.playerPatronGod,M.playerPatron);
  patronMini('foe-patron',M.aiPatronGod,M.aiPatron);
- $('foe-patron-lbl').textContent='PATRON: '+M.aiPatronGod.name.toUpperCase();
+ $('foe-patron-lbl').textContent=TRAIT_GLYPHS[M.aiPatron]+' patron';
+ $('me-patron-lbl').textContent=TRAIT_GLYPHS[M.playerPatron]+' patron';
+ mkArena=M.arena;
  show('scr-battle');
  log('The arena is <b>'+ARENAS[M.arena].name+'</b>. '+esc(M.playerPatronGod.name)+' watches over you.');
  startRound();
@@ -643,7 +706,10 @@ function renderHand(){
   const d=document.createElement('div');d.innerHTML=cardHTML(g);
   const c=d.firstChild;c.dataset.gid=g.id;
   if(g.id===selId)c.classList.add('sel');
-  c.addEventListener('click',()=>{selId=g.id;renderHand();showDetail(g);});
+  c.addEventListener('click',()=>{
+   if(selId===g.id&&phase==='pick'){playerPick(g.id);return;}
+   selId=g.id;renderHand();showDetail(g);
+  });
   el.appendChild(c);
  });
 }
@@ -890,18 +956,85 @@ function endMatch(winner){
  setTimeout(()=>show('scr-end'),REDUCED?100:1200);
 }
 
-/* ---------- particles ---------- */
-function dustInit(){
- const c=$('dust'),x=c.getContext('2d');let W,H,ps=[];
- function rs(){W=c.width=innerWidth;H=c.height=innerHeight;}
+/* ---------- Mortal Kombat arena background (canvas 2D) ----------
+   2D canvas, phone-budgeted: drifting smoke, pooled rising embers,
+   per-arena dark stage silhouettes, floor sheen. Frozen when the tab
+   is hidden; a single static frame under prefers-reduced-motion. */
+let mkArena='olympus',mkRunning=false;
+function mkInit(){
+ const c=$('mkbg'),x=c.getContext('2d');let W,H;
+ function rs(){const d=Math.min(2,window.devicePixelRatio||1);
+  W=c.width=Math.floor(innerWidth*d);H=c.height=Math.floor(innerHeight*d);}
  rs();addEventListener('resize',rs);
- for(let i=0;i<45;i++)ps.push({x:Math.random()*2000,y:Math.random()*2000,r:Math.random()*1.8+.4,s:Math.random()*.25+.05,o:Math.random()*.5+.15});
- (function loop(){
-  x.clearRect(0,0,W,H);
-  for(const p of ps){p.y-=p.s;if(p.y<-4){p.y=H+4;p.x=Math.random()*W;}
-   x.beginPath();x.arc(p.x%W,p.y,p.r,0,7);x.fillStyle='rgba(232,182,76,'+p.o+')';x.fill();}
-  if(!REDUCED)requestAnimationFrame(loop);
- })();
+ const embers=[];
+ for(let i=0;i<55;i++)embers.push({x:Math.random(),y:Math.random(),
+  s:Math.random()*.0016+.0006,r:Math.random()*2+.6,o:Math.random()*.6+.2,ph:Math.random()*7});
+ let flash=0,nextFlash=200,t=0;
+ function silhouettes(){
+  x.save();x.fillStyle='#000';x.strokeStyle='#000';x.globalAlpha=.55;
+  if(mkArena==='olympus'){
+   const cols=[[.05,.60,.11,.32],[.83,.56,.12,.36],[.66,.66,.07,.24]];
+   for(let i=0;i<cols.length;i++){const bx=cols[i][0]*W,by=cols[i][1]*H,bw=cols[i][2]*W,bh=cols[i][3]*H;
+    x.fillRect(bx,by,bw,bh);
+    x.beginPath();x.moveTo(bx,by);x.lineTo(bx+bw*.3,by-bh*.07);x.lineTo(bx+bw*.62,by);
+    x.lineTo(bx+bw*.82,by-bh*.05);x.lineTo(bx+bw,by);x.closePath();x.fill();}
+  }else if(mkArena==='alexandria'){
+   for(let i=0;i<3;i++){const sy=H*(.55+i*.13);x.globalAlpha=.5;x.fillRect(W*.07,sy,W*.86,H*.022);}
+   x.globalAlpha=.4;
+   for(let i=0;i<7;i++){const sx=W*(.12+i*.12),sy=H*(.50+((i*53)%28)/100);
+    x.fillRect(sx,sy,W*.05,H*.05);}
+  }else{
+   x.lineWidth=Math.max(2,W*.008);
+   const trees=[.14,.82];
+   for(let i=0;i<trees.length;i++){const bx=trees[i]*W,by=H*.96;
+    x.beginPath();x.moveTo(bx,by);x.lineTo(bx,by-H*.30);
+    x.moveTo(bx,by-H*.16);x.lineTo(bx-W*.06,by-H*.30);
+    x.moveTo(bx,by-H*.21);x.lineTo(bx+W*.05,by-H*.34);x.stroke();}
+  }
+  x.restore();
+ }
+ function draw(){
+  const g=x.createLinearGradient(0,0,0,H);
+  if(mkArena==='olympus'){g.addColorStop(0,'#0a1226');g.addColorStop(.62,'#060a14');g.addColorStop(1,'#02040a');}
+  else if(mkArena==='alexandria'){g.addColorStop(0,'#1d0e04');g.addColorStop(.62,'#0d0703');g.addColorStop(1,'#030201');}
+  else{g.addColorStop(0,'#220609');g.addColorStop(.62,'#0e0405');g.addColorStop(1,'#030102');}
+  x.fillStyle=g;x.fillRect(0,0,W,H);
+  for(let i=0;i<5;i++){
+   const sx=((t*.00012*(i+1))%1.4-.2)*W,sy=H*(.24+i*.15),r=W*(.26+((i*37)%22)/100);
+   const tint=mkArena==='elysian'?'120,32,32':(mkArena==='alexandria'?'90,50,26':'58,62,84');
+   const rg=x.createRadialGradient(sx,sy,0,sx,sy,r);
+   rg.addColorStop(0,'rgba('+tint+',.11)');rg.addColorStop(1,'rgba('+tint+',0)');
+   x.fillStyle=rg;x.fillRect(0,0,W,H);
+  }
+  silhouettes();
+  if(mkArena==='alexandria'){
+   for(let i=0;i<4;i++){const fx=W*(.2+i*.2),fy=H*(.52+((i*53)%30)/100);
+    const fl=.5+.5*Math.sin(t*.09+i*2.1);
+    const fg=x.createRadialGradient(fx,fy,0,fx,fy,W*.085);
+    fg.addColorStop(0,'rgba(255,'+Math.floor(118+82*fl)+',40,'+(.20+.15*fl).toFixed(3)+')');
+    fg.addColorStop(1,'rgba(255,80,20,0)');
+    x.fillStyle=fg;x.fillRect(0,0,W,H);}
+  }
+  if(mkArena==='olympus'){
+   if(flash>0){x.fillStyle='rgba(170,200,255,'+(flash*.004).toFixed(3)+')';x.fillRect(0,0,W,H);flash--;}
+   else if(t>nextFlash){flash=14;nextFlash=t+240+Math.random()*420;}
+  }
+  for(let i=0;i<embers.length;i++){const p=embers[i];
+   p.y-=p.s*(1+.4*Math.sin(t*.02+p.ph));p.x+=Math.sin(t*.015+p.ph)*.0004;
+   if(p.y<-.02){p.y=1.02;p.x=Math.random();}
+   const fl=.5+.5*Math.sin(t*.12+p.ph);
+   x.beginPath();x.arc(p.x*W,p.y*H,p.r,0,7);
+   x.fillStyle='rgba(255,'+Math.floor(140+80*fl)+',60,'+(p.o*(.35+.65*fl)).toFixed(3)+')';x.fill();
+  }
+  const sh=x.createLinearGradient(0,H*.82,0,H);
+  sh.addColorStop(0,'rgba(232,182,76,0)');sh.addColorStop(1,'rgba(232,182,76,.07)');
+  x.fillStyle=sh;x.fillRect(0,H*.82,W,H*.18);
+ }
+ function loop(){draw();t++;
+  if(!REDUCED&&!document.hidden)requestAnimationFrame(loop);else mkRunning=false;}
+ document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden&&!REDUCED&&!mkRunning){mkRunning=true;requestAnimationFrame(loop);}});
+ if(REDUCED){draw();}else{mkRunning=true;requestAnimationFrame(loop);}
 }
 function goldBurst(){
  const c=$('burst'),x=c.getContext('2d');c.style.display='block';
@@ -924,7 +1057,7 @@ $('btn-crown').addEventListener('click',crownPatron);
 $('btn-towar').addEventListener('click',beginBattle);
 $('btn-rematch').addEventListener('click',()=>{M=newMatch();renderPatronScreen();});
 $('btn-menu').addEventListener('click',renderStart);
-dustInit();
+mkInit();
 renderStart();
 </script>
 </body>
