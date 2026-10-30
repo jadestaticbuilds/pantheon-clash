@@ -324,7 +324,7 @@ details.howto li{margin:6px 0;}
     <p class="subtitle">Eighteen gods. Three pantheons. One arena.</p>
     <button class="btn" id="btn-enter">Enter the Arena</button>
     <div class="record" id="start-record"></div>
-    <div class="buildtag" id="buildtag">build 2026-10-30-0030</div>
+    <div class="buildtag" id="buildtag">build 2026-10-30-0035</div>
     <details class="howto">
       <summary>How to play</summary>
       <ul>
@@ -533,12 +533,14 @@ function saveRecord(r){LS.set('pc-wins',r.wins);LS.set('pc-losses',r.losses);LS.
 const $=id=>document.getElementById(id);
 const REDUCED=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 /* Tap-smoothness audit hardening: never fail silently. A visible toast beats a dead screen. */
-window.addEventListener('error',function(e){
- if(document.querySelector('.err-toast'))return;
- var t=document.createElement('div');t.className='err-toast';
- t.textContent='A hiccup happened. Tap again.';
+function toast(msg){
+ var old=document.querySelector('.err-toast');if(old&&old.parentNode)old.parentNode.removeChild(old);
+ var t=document.createElement('div');t.className='err-toast';t.textContent=msg;
  (document.getElementById('app')||document.body).appendChild(t);
- setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},2600);
+ setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},3200);
+}
+window.addEventListener('error',function(e){
+ toast('A hiccup happened. Tap again.');
 });
 let M=null,selId=null,aiLocked=null,aiSightPending=null,sightTrait=null,sightPower=null,phase='idle';
 let revP=null,revA=null,revPT=0,revAT=0,revPB=[],revAB=[],revToken=0;
@@ -746,7 +748,7 @@ function playerUseSight(kind){
  M.pUsed[kind]=true;
  if(!aiLocked){
   const pk=aiPick(M.aiHand,possibleSet(),aCtx(),pCtx());
-  aiLocked=removeFrom(M.aiHand,pk.god.id);M.aiPlayed.push(aiLocked);
+  aiLocked=removeFrom(M.aiHand,(pk.god||M.aiHand[0]).id);M.aiPlayed.push(aiLocked);
  }
  let msg;
  if(kind==='strategy')sightTrait=TRAIT_NAMES[aiLocked.trait];else sightPower=aiLocked.power;
@@ -758,24 +760,30 @@ function playerUseSight(kind){
  renderUseRow();renderFoeHand();
 }
 function playerPick(id){
- if(phase!=='pick'){if(window.console)console.log('[pc] Play tapped outside pick phase:',phase);return;}
- const g=removeFrom(M.playerHand,id);if(!g)return;
+ try{
+ if(phase!=='pick'){toast('Not the pick phase right now.');return;}
+ const g=removeFrom(M.playerHand,id);if(!g){toast('That god is not in your hand.');return;}
  M.playerPlayed.push(g);revP=g;
  let aiGod;
  if(aiLocked){aiGod=aiLocked;aiLocked=null;}
  else if(aiSightPending){
-  aiGod=aiBestResponse(M.aiHand,g,aCtx(),pCtx());
+  aiGod=aiBestResponse(M.aiHand,g,aCtx(),pCtx())||M.aiHand[0];
   removeFrom(M.aiHand,aiGod.id);M.aiPlayed.push(aiGod);
   M.aUsed[aiSightPending]=true;
   log('The rival answers your '+TRAIT_NAMES[g.trait].toLowerCase()+' god with knowledge.');
   aiSightPending=null;
  }else{
   const pk=aiPick(M.aiHand,possibleSet(),aCtx(),pCtx());
-  aiGod=pk.god;removeFrom(M.aiHand,aiGod.id);M.aiPlayed.push(aiGod);
+  aiGod=pk.god||M.aiHand[0];
+  removeFrom(M.aiHand,aiGod.id);M.aiPlayed.push(aiGod);
  }
  revA=aiGod;phase='reveal';
  $('detail').classList.remove('on');$('use-row').innerHTML='';$('sight-zone').innerHTML='';
  renderHand();renderFoeHand();revealPhase();
+ }catch(err){
+  toast('Play failed: '+((err&&err.message)||err));
+  if(window.console&&console.log)console.log('[pc] playerPick throw:',err);
+ }
 }
 function brkText(brk){
  return brk.map(b=>b[0]+' +'+b[1]).join('  ');
