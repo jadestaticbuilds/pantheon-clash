@@ -30,7 +30,8 @@ body{overflow:hidden;height:100dvh;overscroll-behavior:none;}
   background:radial-gradient(ellipse 125% 105% at 50% 38%, transparent 52%, rgba(0,0,0,.62) 100%);}
 #burst{position:fixed;inset:0;z-index:60;pointer-events:none;display:none;}
 #app{position:relative;z-index:2;max-width:520px;margin:0 auto;height:100dvh;max-height:100dvh;
-  overflow:hidden;padding:10px 10px 12px;}
+  overflow:hidden;padding:10px 10px 12px;-webkit-user-select:none;user-select:none;
+  -webkit-touch-callout:none;}
 #app.shake{animation:shk .45s;}
 @keyframes shk{0%,100%{transform:translate(0,0)}20%{transform:translate(-7px,4px)}
   40%{transform:translate(6px,-5px)}60%{transform:translate(-5px,-3px)}80%{transform:translate(4px,3px)}}
@@ -251,8 +252,7 @@ details.howto li{margin:6px 0;}
 #sight-zone .sight-banner{margin:2px 0;padding:7px 10px;font-size:12px;}
 .use-row{margin:0;flex:none;}
 .use-row .btn{min-height:44px;font-size:13px;margin:0;}
-#detail{position:absolute;left:10px;right:10px;bottom:178px;z-index:25;margin:0;
-  padding:8px;border:1px solid var(--gold-dim);border-radius:12px;
+#detail{flex:none;margin:0;padding:8px;border:1px solid var(--gold-dim);border-radius:12px;
   background:linear-gradient(180deg,#141b30,#0a0f1c);display:none;
   box-shadow:0 10px 30px rgba(0,0,0,.7);}
 #detail.on{display:block;}
@@ -324,7 +324,7 @@ details.howto li{margin:6px 0;}
     <p class="subtitle">Eighteen gods. Three pantheons. One arena.</p>
     <button class="btn" id="btn-enter">Enter the Arena</button>
     <div class="record" id="start-record"></div>
-    <div class="buildtag" id="buildtag">build 2026-10-30-0035</div>
+    <div class="buildtag" id="buildtag">build 2026-10-30-0045</div>
     <details class="howto">
       <summary>How to play</summary>
       <ul>
