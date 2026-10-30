@@ -327,7 +327,7 @@ details.howto li{margin:6px 0;}
     <p class="subtitle">Eighteen gods. Three pantheons. One arena.</p>
     <button class="btn" id="btn-enter">Enter the Arena</button>
     <div class="record" id="start-record"></div>
-    <div class="buildtag" id="buildtag">build 2026-10-30-1725</div>
+    <div class="buildtag" id="buildtag">build 2026-10-30-1740</div>
     <details class="howto">
       <summary>How to play</summary>
       <ul>
@@ -543,7 +543,9 @@ function toast(msg){
  setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},3200);
 }
 window.addEventListener('error',function(e){
- toast('A hiccup happened. Tap again.');
+ var m=(e&&(e.message||(e.error&&e.error.message)))||'unknown error';
+ toast('Hiccup: '+m+'. Tap again.');
+ if(window.console&&console.log)console.log('[pc] uncaught:',e);
 });
 let M=null,selId=null,aiLocked=null,aiSightPending=null,sightTrait=null,sightPower=null,phase='idle';
 let revP=null,revA=null,revPT=0,revAT=0,revPB=[],revAB=[],revToken=0;
@@ -805,11 +807,16 @@ function revealPhase(){
   $('flipP').classList.remove('facedown');$('flipA').classList.remove('facedown');
  },REDUCED?60:450);
  setTimeout(()=>{
-  computeReveal();
-  const t=$('totals');t.style.visibility='visible';
-  t.innerHTML='<div class="total-box"><div class="tn">'+revPT+'</div><div class="tb">'+esc(brkText(revPB))+'</div></div>'+
-   '<div class="total-box"><div class="tn">'+revAT+'</div><div class="tb">'+esc(brkText(revAB))+'</div></div>';
-  maybeLoki();
+  try{
+   computeReveal();
+   const t=$('totals');t.style.visibility='visible';
+   t.innerHTML='<div class="total-box"><div class="tn">'+revPT+'</div><div class="tb">'+esc(brkText(revPB))+'</div></div>'+
+    '<div class="total-box"><div class="tn">'+revAT+'</div><div class="tb">'+esc(brkText(revAB))+'</div></div>';
+   maybeLoki();
+  }catch(err){
+   toast('Reveal failed: '+((err&&err.message)||err));
+   if(window.console&&console.log)console.log('[pc] reveal throw:',err);
+  }
  },REDUCED?120:1100);
 }
 function computeReveal(){
@@ -823,9 +830,12 @@ function maybeLoki(){
  const aiLoses=revAT<revPT&&(revPT-revAT)<=3;
  if(aiLoses&&aiHasLoki){
   setTimeout(()=>{
-   if(tok!==revToken||phase!=='reveal')return;
-   const loki=M.aiHand.find(g=>g.ability==='trickster');
-   const alt=aiBestResponse(M.aiHand.filter(g=>g.id!==loki.id),revP,aCtx(),pCtx());
+   try{
+    if(tok!==revToken||phase!=='reveal')return;
+    const loki=M.aiHand.find(g=>g.ability==='trickster');
+    if(!loki){showStrike();return;}
+    const alt=aiBestResponse(M.aiHand.filter(g=>g.id!==loki.id),revP,aCtx(),pCtx());
+    if(!alt){showStrike();return;}
    const newT=computeTotal(alt,aCtx(),revP).total;
    if(newT>revAT&&(newT>revPT||(newT===revPT&&alt.ability==='weighing'))){
     M.aiHand.push(revA);M.aiPlayed=M.aiPlayed.filter(g=>g.id!==revA.id);
@@ -835,6 +845,11 @@ function maybeLoki(){
     $('roundmsg').textContent='The rival swaps gods.';
     revealPhase();
    }else{showStrike();}
+   }catch(err){
+    toast('Rival trick failed: '+((err&&err.message)||err));
+    if(window.console&&console.log)console.log('[pc] trickster throw:',err);
+    showStrike();
+   }
   },REDUCED?100:800);
   return;
  }
