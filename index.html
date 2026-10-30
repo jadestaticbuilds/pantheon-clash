@@ -88,7 +88,59 @@ details.howto li{margin:6px 0;}
 .card.norse{--c1:var(--nor1);--c2:var(--nor2);}
 .card-in{background:linear-gradient(180deg,#101827,#070b14);border-radius:10px;
   padding:8px 6px;text-align:center;position:relative;min-height:100%;}
-.card .pglyph{font-size:34px;line-height:1.15;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6));}
+/* holographic 2.5D portraits: layered backdrop, rays, monumental glyph, sparkles, foil */
+.portrait{position:relative;height:78px;border-radius:8px;overflow:hidden;margin:2px 0 5px;
+  isolation:isolate;animation:pfloat 7s ease-in-out infinite;}
+@keyframes pfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+.hand .portrait{height:58px;}
+#detail .portrait{height:84px;}
+.fighter .portrait{height:96px;}
+.plx{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;will-change:transform;}
+.plx .pback,.plx .prays{position:absolute;inset:-14%;}
+.portrait.egypt .pback{background:
+  radial-gradient(ellipse 90% 70% at 50% 118%, rgba(255,176,66,.65), rgba(255,176,66,0) 62%),
+  radial-gradient(ellipse 120% 90% at 50% -30%, #431f06 0%, #160a03 55%, #050302 100%);}
+.portrait.greek .pback{background:
+  radial-gradient(ellipse 90% 70% at 50% 118%, rgba(96,150,235,.55), rgba(96,150,235,0) 62%),
+  radial-gradient(ellipse 120% 90% at 50% -30%, #12233f 0%, #070d18 55%, #030509 100%);}
+.portrait.norse .pback{background:
+  radial-gradient(ellipse 70% 55% at 18% 118%, rgba(64,224,190,.40), rgba(64,224,190,0) 60%),
+  radial-gradient(ellipse 70% 55% at 82% 118%, rgba(140,110,240,.35), rgba(140,110,240,0) 60%),
+  radial-gradient(ellipse 120% 90% at 50% -30%, #18202e 0%, #080b11 55%, #030406 100%);}
+.prays{opacity:.4;animation:rayspin 26s linear infinite;}
+@keyframes rayspin{to{transform:rotate(360deg)}}
+.portrait.egypt .prays{background:repeating-conic-gradient(from 0deg at 50% 50%, rgba(255,214,130,.16) 0deg 5deg, transparent 5deg 16deg);}
+.portrait.greek .prays{background:repeating-conic-gradient(from 0deg at 50% 50%, rgba(150,190,255,.14) 0deg 5deg, transparent 5deg 16deg);}
+.portrait.norse .prays{background:repeating-conic-gradient(from 0deg at 50% 50%, rgba(170,240,225,.12) 0deg 5deg, transparent 5deg 16deg);}
+.plx .pglyph{font-size:46px;line-height:1;
+  filter:drop-shadow(0 3px 9px rgba(0,0,0,.75)) drop-shadow(0 0 14px rgba(255,255,255,.12));}
+.hand .plx .pglyph{font-size:36px;}
+#detail .plx .pglyph,.fighter .plx .pglyph{font-size:54px;}
+.pspark{position:absolute;inset:0;pointer-events:none;
+  background:
+   radial-gradient(1.6px 1.6px at 18% 28%, rgba(255,255,255,.95), transparent 70%),
+   radial-gradient(1.2px 1.2px at 72% 18%, rgba(255,255,255,.9), transparent 70%),
+   radial-gradient(1.8px 1.8px at 84% 62%, rgba(255,255,255,.95), transparent 70%),
+   radial-gradient(1.2px 1.2px at 38% 74%, rgba(255,255,255,.9), transparent 70%),
+   radial-gradient(1.5px 1.5px at 58% 38%, rgba(255,255,255,.95), transparent 70%);
+  animation:tw1 3.4s ease-in-out infinite;}
+.pspark.s2{background:
+   radial-gradient(1.4px 1.4px at 30% 52%, rgba(255,255,255,.9), transparent 70%),
+   radial-gradient(1.7px 1.7px at 64% 80%, rgba(255,255,255,.95), transparent 70%),
+   radial-gradient(1.2px 1.2px at 88% 38%, rgba(255,255,255,.9), transparent 70%),
+   radial-gradient(1.5px 1.5px at 12% 66%, rgba(255,255,255,.95), transparent 70%);
+  animation:tw2 4.1s ease-in-out infinite;}
+@keyframes tw1{0%,100%{opacity:.15}50%{opacity:.9}}
+@keyframes tw2{0%,100%{opacity:.85}50%{opacity:.2}}
+.pfoil{position:absolute;inset:-45%;pointer-events:none;mix-blend-mode:screen;opacity:.6;
+  background:
+   linear-gradient(115deg, transparent 42%, rgba(255,45,150,.22) 47%, rgba(64,224,255,.24) 51%, rgba(255,236,120,.20) 55%, transparent 60%),
+   conic-gradient(from 20deg at 50% 50%, rgba(255,0,120,.14), rgba(255,180,0,.10), rgba(0,220,255,.14), rgba(140,90,255,.14), rgba(255,0,120,.14));
+  animation:foilsweep 8s ease-in-out infinite;}
+@keyframes foilsweep{
+ 0%,100%{transform:translateX(-13%);filter:hue-rotate(-25deg);}
+ 50%{transform:translateX(13%);filter:hue-rotate(45deg);}}
 .card .pname{font-family:Georgia,serif;font-size:13px;font-weight:700;margin-top:2px;
   letter-spacing:.4px;}
 .card .ppanth{font-size:9px;color:var(--ink-dim);letter-spacing:1.5px;text-transform:uppercase;}
@@ -112,7 +164,6 @@ details.howto li{margin:6px 0;}
 .hand .card.spent{opacity:.32;filter:grayscale(.8);pointer-events:none;}
 .hand .card.spent::after{content:"FOUGHT";position:absolute;inset:auto 0 38% 0;text-align:center;
   font-size:11px;font-weight:800;letter-spacing:2px;color:#fff;text-shadow:0 1px 3px #000;}
-.hand .card .pglyph{font-size:28px;}
 .hand .card .pab{display:none;}
 /* detail panel */
 #detail{margin:10px 0;padding:10px;border:1px solid var(--gold-dim);border-radius:12px;
@@ -187,6 +238,8 @@ details.howto li{margin:6px 0;}
   .flip .card-in{transition:none;}
   .dmg-float{animation-duration:.01s;}
   .sudden{animation:none;}
+  .portrait,.pfoil,.pspark,.prays{animation:none;}
+  .pfoil{opacity:.35;transform:none;}
 }
 </style>
 </head>
@@ -419,11 +472,51 @@ let revP=null,revA=null,revPT=0,revAT=0,revPB=[],revAB=[],revToken=0;
 function show(id){document.querySelectorAll('#app section').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');window.scrollTo(0,0);}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
 
+/* ---------- holographic portrait parallax (2.5D tilt) ---------- */
+(function(){
+ if(REDUCED)return;
+ let raf=0,tx=0,ty=0,cur=null;
+ function apply(){
+  raf=0;
+  if(!cur||!document.contains(cur)){cur=null;return;}
+  const layers=cur.querySelectorAll('.plx');
+  for(let i=0;i<layers.length;i++){
+   const d=parseFloat(layers[i].getAttribute('data-d')||'0');
+   layers[i].style.transform='translate('+(tx*d).toFixed(1)+'px,'+(ty*d).toFixed(1)+'px)';
+  }
+ }
+ function reset(p){
+  const layers=p.querySelectorAll('.plx');
+  for(let i=0;i<layers.length;i++)layers[i].style.transform='';
+ }
+ const app=document.getElementById('app');
+ app.addEventListener('pointermove',function(e){
+  const p=e.target&&e.target.closest?e.target.closest('.portrait'):null;
+  if(!p)return;
+  const r=p.getBoundingClientRect();
+  tx=Math.max(-1,Math.min(1,((e.clientX-r.left)/r.width-.5)*2));
+  ty=Math.max(-1,Math.min(1,((e.clientY-r.top)/r.height-.5)*2));
+  if(cur&&cur!==p)reset(cur);
+  cur=p;
+  if(!raf)raf=requestAnimationFrame(apply);
+ },{passive:true});
+ app.addEventListener('pointerleave',function(){if(cur){reset(cur);cur=null;}},{passive:true});
+ document.addEventListener('pointerup',function(){if(cur){reset(cur);cur=null;}},{passive:true});
+ document.addEventListener('visibilitychange',function(){
+  if(document.hidden)document.querySelectorAll('.portrait').forEach(reset);
+ });
+})();
+
 function cardHTML(g,extra){
  extra=extra||'';
  return '<div class="card '+g.pantheon+'"><div class="card-in">'+
  '<div class="frame-glyph">'+PANTH_GLYPHS[g.pantheon]+'</div>'+extra+
- '<div class="pglyph">'+g.glyph+'</div>'+
+ '<div class="portrait '+g.pantheon+'">'+
+ '<div class="plx" data-d="6"><div class="pback"></div></div>'+
+ '<div class="plx" data-d="3"><div class="prays"></div></div>'+
+ '<div class="plx" data-d="11"><div class="pglyph">'+g.glyph+'</div></div>'+
+ '<div class="pspark s1"></div><div class="pspark s2"></div>'+
+ '<div class="pfoil"></div></div>'+
  '<div class="pname">'+esc(g.name)+'</div>'+
  '<div class="ppanth">'+PANTH_NAMES[g.pantheon]+'</div>'+
  '<div class="prow"><div class="ppow">'+g.power+'</div>'+
