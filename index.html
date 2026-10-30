@@ -238,8 +238,11 @@ details.howto li{margin:6px 0;}
 .bmid .pips{margin:0;gap:5px;}
 .bmid .pip{width:24px;height:24px;font-size:10px;border-width:1.5px;}
 .bmid #roundmsg{margin:0;font-size:14px;min-height:0;}
-#stage{flex:1 1 auto;min-height:0;margin:0;overflow:hidden;position:relative;}
-#stage .fighters{height:100%;align-items:center;}
+#stage{flex:1 1 auto;min-height:0;margin:0;overflow:hidden;position:relative;
+  display:flex;flex-direction:column;}
+#stage .fighters{flex:1 1 auto;min-height:0;align-items:center;}
+#stage .totals{flex:none;}
+#strike-zone{flex:none;}
 #stage .fighter .portrait{height:clamp(64px,13dvh,110px);}
 #stage .fighter .plx .pglyph{font-size:clamp(34px,7dvh,54px);}
 #stage .totals{margin-top:6px;}
@@ -324,7 +327,7 @@ details.howto li{margin:6px 0;}
     <p class="subtitle">Eighteen gods. Three pantheons. One arena.</p>
     <button class="btn" id="btn-enter">Enter the Arena</button>
     <div class="record" id="start-record"></div>
-    <div class="buildtag" id="buildtag">build 2026-10-30-0045</div>
+    <div class="buildtag" id="buildtag">build 2026-10-30-1725</div>
     <details class="howto">
       <summary>How to play</summary>
       <ul>
@@ -724,7 +727,8 @@ function renderHand(){
   const c=d.firstChild;c.dataset.gid=g.id;
   if(g.id===selId)c.classList.add('sel');
   c.addEventListener('click',()=>{
-   if(selId===g.id&&phase==='pick'){playerPick(g.id);return;}
+   if(phase!=='pick')return;
+   if(selId===g.id){playerPick(g.id);return;}
    selId=g.id;renderHand();showDetail(g);
   });
   el.appendChild(c);
