@@ -418,11 +418,11 @@ details.howto li{margin:6px 0;}
    (Reads as the weighing tipping, not a clash.) */
 'use strict';
 const GODS=[
- {id:'ra',name:'Ra',pantheon:'egypt',glyph:'\u2600\uFE0F',power:8,trait:'W',ability:'noon',abilityText:'Noon: +1 for every round you have won.'},
+ {id:'ra',name:'Ra',pantheon:'egypt',glyph:'\u2600\uFE0F',power:7,trait:'W',ability:'noon',abilityText:'Noon: +1 for every round you have won.'},
  {id:'isis',name:'Isis',pantheon:'egypt',glyph:'\uD83E\uDEBD',power:6,trait:'K',ability:'ward',abilityText:'Ward: the first round she would lose deals no damage.'},
- {id:'osiris',name:'Osiris',pantheon:'egypt',glyph:'\u2697\uFE0F',power:7,trait:'K',ability:'underworld',abilityText:'Underworld: when defeated, restore 4 life.'},
+ {id:'osiris',name:'Osiris',pantheon:'egypt',glyph:'\u2697\uFE0F',power:6,trait:'K',ability:'underworld',abilityText:'Underworld: when defeated, restore 4 life.'},
  {id:'anubis',name:'Anubis',pantheon:'egypt',glyph:'\uD83D\uDC3A',power:6,trait:'W',ability:'weighing',abilityText:'Weighing: rounds he plays that tie count as your win.'},
- {id:'seth',name:'Seth',pantheon:'egypt',glyph:'\u26C8\uFE0F',power:9,trait:'C',ability:'chaos',abilityText:'Chaos: +2 while your life is lower.'},
+ {id:'seth',name:'Seth',pantheon:'egypt',glyph:'\u26C8\uFE0F',power:8,trait:'C',ability:'chaos',abilityText:'Chaos: +2 while your life is lower.'},
  {id:'horus',name:'Horus',pantheon:'egypt',glyph:'\uD83E\uDD85',power:7,trait:'C',ability:'falcon',abilityText:'Falcon Strike: +3 if played in round 1 or 2.'},
  {id:'zeus',name:'Zeus',pantheon:'greek',glyph:'\u26A1',power:9,trait:'C',ability:'lightning',abilityText:'Lightning: +3 in round 1.'},
  {id:'athena',name:'Athena',pantheon:'greek',glyph:'\uD83E\uDD89',power:7,trait:'W',ability:'strategy',abilityText:'Strategy: see the enemy trait before you pick, once per match.'},
@@ -430,11 +430,11 @@ const GODS=[
  {id:'artemis',name:'Artemis',pantheon:'greek',glyph:'\uD83C\uDF19',power:6,trait:'W',ability:'moonshot',abilityText:'Moonshot: +2 if the enemy god\u2019s Power is higher.'},
  {id:'hades',name:'Hades',pantheon:'greek',glyph:'\uD83D\uDC80',power:7,trait:'W',ability:'tithe',abilityText:'Tithe: +2 damage when he wins a round.'},
  {id:'aphrodite',name:'Aphrodite',pantheon:'greek',glyph:'\uD83C\uDF39',power:5,trait:'K',ability:'charm',abilityText:'Charm: the enemy god loses its trait bonus this round.'},
- {id:'odin',name:'Odin',pantheon:'norse',glyph:'\uD83D\uDC41\uFE0F',power:8,trait:'W',ability:'ravens',abilityText:'Ravens: see the enemy\u2019s Power before you pick, once per match.'},
+ {id:'odin',name:'Odin',pantheon:'norse',glyph:'\uD83D\uDC41\uFE0F',power:9,trait:'W',ability:'ravens',abilityText:'Ravens: see the enemy\u2019s Power before you pick, once per match.'},
  {id:'thor',name:'Thor',pantheon:'norse',glyph:'\uD83D\uDD28',power:9,trait:'C',ability:'thunder',abilityText:'Thunder: +2 against Wisdom gods.'},
  {id:'loki',name:'Loki',pantheon:'norse',glyph:'\uD83D\uDC0D',power:5,trait:'W',ability:'trickster',abilityText:'Trickster: swap your god after the reveal, once per match.'},
- {id:'freya',name:'Freya',pantheon:'norse',glyph:'\uD83D\uDC08',power:6,trait:'K',ability:'falconcloak',abilityText:'Falcon Cloak: +2 while your life is lower.'},
- {id:'tyr',name:'Tyr',pantheon:'norse',glyph:'\uD83D\uDDE1\uFE0F',power:7,trait:'C',ability:'onehand',abilityText:'One-Hand: +3 while your life is below 10.'},
+ {id:'freya',name:'Freya',pantheon:'norse',glyph:'\uD83D\uDC08',power:7,trait:'K',ability:'falconcloak',abilityText:'Falcon Cloak: +2 while your life is lower.'},
+ {id:'tyr',name:'Tyr',pantheon:'norse',glyph:'\uD83D\uDDE1\uFE0F',power:8,trait:'C',ability:'onehand',abilityText:'One-Hand: +3 while your life is below 10.'},
  {id:'baldur',name:'Baldur',pantheon:'norse',glyph:'\uD83C\uDF1F',power:7,trait:'K',ability:'beloved',abilityText:'Beloved: enemy defeat abilities do not trigger against him.'}
 ];
 const ARENAS={
