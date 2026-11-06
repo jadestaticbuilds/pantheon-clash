@@ -27,18 +27,18 @@ html,body{margin:0;padding:0;background:#020306;color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   height:100%;touch-action:manipulation;}
 button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
-.err-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:99;
+.err-toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:99;
   background:#3a1020;border:1px solid #ff2e88;color:#ffdfe9;font-size:13px;
   padding:10px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.6);
   max-width:88vw;text-align:center;}
 .buildtag{font-size:10px;color:#3a4560;text-align:center;margin-top:10px;letter-spacing:1px;}
-body{overflow:hidden;height:100dvh;overscroll-behavior:none;}
+body{overflow:hidden;height:100vh;height:100dvh;overscroll-behavior:none;}
 #mkbg{position:fixed;inset:0;z-index:0;pointer-events:none;}
 #vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
   background:radial-gradient(ellipse 125% 105% at 50% 38%, transparent 52%, rgba(0,0,0,.62) 100%);}
 #burst{position:fixed;inset:0;z-index:60;pointer-events:none;display:none;}
-#app{position:relative;z-index:2;max-width:520px;margin:0 auto;height:100dvh;max-height:100dvh;
-  overflow:hidden;padding:10px 10px 12px;-webkit-user-select:none;user-select:none;
+#app{position:relative;z-index:2;max-width:520px;margin:0 auto;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;
+  overflow:hidden;padding:10px 10px calc(12px + env(safe-area-inset-bottom));-webkit-user-select:none;user-select:none;
   -webkit-touch-callout:none;}
 #app.shake{animation:shk .45s;}
 @keyframes shk{0%,100%{transform:translate(0,0)}20%{transform:translate(-7px,4px)}
