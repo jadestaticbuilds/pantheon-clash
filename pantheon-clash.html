@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+/* ?view=desktop preview: force desktop theme on narrow screens */
+try {
+  if (new URLSearchParams(location.search).get("view") === "desktop") {
+    document.querySelector('meta[name="viewport"]').setAttribute("content", "width=1280");
+  }
+} catch (e) {}
+</script>
+<title>Pantheon Clash</title>
+<style>
+:root{
+  --gold:#e8b64c; --gold2:#f7dc8a; --gold-dim:#8a6a24;
+  --bg0:#04060c; --bg1:#0a0f1c; --panel:#0d1424;
+  --ink:#f2ead8; --ink-dim:#a89f88;
+  --red:#e5484d; --green:#3fb96b;
+  --egy1:#f6d365; --egy2:#8a5a00;
+  --grk1:#a9cdf0; --grk2:#2f4d7a;
+  --nor1:#c7cfda; --nor2:#4c5866;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;background:#020306;color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  height:100%;touch-action:manipulation;}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+.err-toast{position:fixed;left:50%;bottom:34px;bottom:max(34px, calc(26px + env(safe-area-inset-bottom)));transform:translateX(-50%);z-index:99;
+  background:#3a1020;border:1px solid #ff2e88;color:#ffdfe9;font-size:13px;
+  padding:10px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.6);
+  max-width:88vw;text-align:center;}
+body{overflow:hidden;height:100vh;height:100dvh;overscroll-behavior:none;}
+#mkbg{position:fixed;inset:0;z-index:0;pointer-events:none;}
+#vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse 125% 105% at 50% 38%, transparent 52%, rgba(0,0,0,.62) 100%);}
+#burst{position:fixed;inset:0;z-index:60;pointer-events:none;display:none;}
+#app{position:relative;z-index:2;max-width:520px;margin:0 auto;height:100vh;height:100dvh;max-height:100vh;max-height:100dvh;
+  overflow:hidden;padding:10px 10px calc(12px + env(safe-area-inset-bottom));padding-bottom:34px;padding-bottom:max(34px, calc(12px + env(safe-area-inset-bottom)));-webkit-user-select:none;user-select:none;
+  -webkit-touch-callout:none;}
+#app.shake{animation:shk .45s;}
+@keyframes shk{0%,100%{transform:translate(0,0)}20%{transform:translate(-7px,4px)}
+  40%{transform:translate(6px,-5px)}60%{transform:translate(-5px,-3px)}80%{transform:translate(4px,3px)}}
+section{display:none;}
+section.on{display:block;height:100%;overflow:hidden;animation:fadein .35s;}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1.title{font-family:Georgia,"Times New Roman",serif;font-size:44px;margin:26px 0 4px;
+  text-align:center;letter-spacing:2px;
+  background:linear-gradient(180deg,var(--gold2),var(--gold) 60%,#9a6f1e);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 0 34px rgba(232,182,76,.25);}
+.subtitle{text-align:center;color:var(--ink-dim);font-size:14px;margin:0 0 18px;
+  font-style:italic;font-family:Georgia,serif;}
+.btn{display:block;width:100%;min-height:52px;margin:10px 0;padding:12px 16px;
+  font-size:17px;font-weight:700;letter-spacing:.5px;color:#1a1206;cursor:pointer;
+  background:linear-gradient(180deg,var(--gold2),var(--gold));
+  border:1px solid #fff3c4;border-radius:12px;
+  box-shadow:0 4px 18px rgba(232,182,76,.35), inset 0 1px 0 #fff8;}
+.btn:active{transform:scale(.98);}
+.btn.ghost{background:transparent;color:var(--gold);border:1px solid var(--gold-dim);
+  box-shadow:none;}
+.btn.small{min-height:48px;font-size:15px;}
+.btn:disabled{opacity:.4;}
+.record{text-align:center;color:var(--ink-dim);font-size:13px;margin:14px 0;}
+.record b{color:var(--gold2);}
+details.howto{margin:14px 0;border:1px solid #2a3350;border-radius:10px;
+  background:var(--panel);padding:10px 14px;font-size:13.5px;line-height:1.55;color:var(--ink-dim);}
+details.howto summary{cursor:pointer;color:var(--gold2);font-weight:700;min-height:44px;
+  display:flex;align-items:center;}
+details.howto ul{margin:8px 0;padding-left:18px;}
+details.howto li{margin:6px 0;}
+.arena-strip{display:flex;align-items:center;gap:10px;margin:8px 0;padding:10px 12px;
+  border-radius:12px;background:var(--panel);border:1px solid #2a3350;}
+.arena-strip .ag{font-size:30px;}
+.arena-strip .an{font-family:Georgia,serif;font-size:17px;color:var(--gold2);}
+.arena-strip .ad{font-size:12px;color:var(--ink-dim);}
+.arena-strip.olympus{border-color:#3f6fb5;box-shadow:0 0 18px rgba(80,140,230,.25);}
+.arena-strip.alexandria{border-color:#a5762a;box-shadow:0 0 18px rgba(232,182,76,.25);}
+.arena-strip.elysian{border-color:#b56a8f;box-shadow:0 0 18px rgba(230,120,170,.22);}
+.lifebar{position:relative;height:30px;border-radius:15px;background:#101827;
+  border:1px solid #2a3350;overflow:hidden;margin:6px 0;}
+.lifebar .fill{position:absolute;inset:2px;border-radius:12px;width:100%;
+  transition:width .7s cubic-bezier(.2,.8,.2,1);}
+.lifebar.me .fill{background:linear-gradient(90deg,#9a6f1e,var(--gold),var(--gold2));}
+.lifebar.foe .fill{background:linear-gradient(90deg,#7a1f24,var(--red),#ff8a8a);}
+.lifebar .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:14px;color:#fff;text-shadow:0 1px 3px #000;}
+.side-label{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
+.side-label .nm{font-family:Georgia,serif;font-size:15px;letter-spacing:1px;color:var(--gold2);}
+.pips{display:flex;gap:8px;justify-content:center;margin:10px 0;}
+.pip{width:34px;height:34px;border-radius:50%;border:2px solid #3a4666;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;
+  color:var(--ink-dim);background:#0a0f1c;font-family:Georgia,serif;}
+.pip.w{border-color:var(--gold);color:#1a1206;background:linear-gradient(180deg,var(--gold2),var(--gold));}
+.pip.l{border-color:var(--red);color:#ffb3b5;background:#2a0f12;}
+.pip.t{border-color:#8a8f9f;color:#c9cfdb;background:#1a2030;}
+/* cards */
+.card{border-radius:12px;padding:2px;position:relative;
+  background:linear-gradient(160deg,var(--c1),var(--c2));
+  box-shadow:0 4px 14px rgba(0,0,0,.55);}
+.card.egypt{--c1:var(--egy1);--c2:var(--egy2);}
+.card.greek{--c1:var(--grk1);--c2:var(--grk2);}
+.card.norse{--c1:var(--nor1);--c2:var(--nor2);}
+.card-in{background:linear-gradient(180deg,#101827,#070b14);border-radius:10px;
+  padding:8px 6px;text-align:center;position:relative;min-height:100%;}
+/* holographic 2.5D portraits: layered backdrop, rays, monumental glyph, sparkles, foil */
+.portrait{position:relative;height:78px;border-radius:8px;overflow:hidden;margin:2px 0 5px;
+  isolation:isolate;animation:pfloat 7s ease-in-out infinite;}
+@keyframes pfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+.hand .portrait{height:58px;}
+#detail .portrait{height:84px;}
+.fighter .portrait{height:96px;}
+.plx{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;will-change:transform;}
+.plx .pback,.plx .prays{position:absolute;inset:-14%;}
+.portrait.egypt .pback{background:
+  radial-gradient(ellipse 90% 70% at 50% 118%, rgba(255,176,66,.65), rgba(255,176,66,0) 62%),
+  radial-gradient(ellipse 120% 90% at 50% -30%, #431f06 0%, #160a03 55%, #050302 100%);}
+.portrait.greek .pback{background:
+  radial-gradient(ellipse 90% 70% at 50% 118%, rgba(96,150,235,.55), rgba(96,150,235,0) 62%),
+  radial-gradient(ellipse 120% 90% at 50% -30%, #12233f 0%, #070d18 55%, #030509 100%);}
+.portrait.norse .pback{background:
+  radial-gradient(ellipse 70% 55% at 18% 118%, rgba(64,224,190,.40), rgba(64,224,190,0) 60%),
+  radial-gradient(ellipse 70% 55% at 82% 118%, rgba(140,110,240,.35), rgba(140,110,240,0) 60%),
+  radial-gradient(ellipse 120% 90% at 50% -30%, #18202e 0%, #080b11 55%, #030406 100%);}
+.prays{opacity:.4;animation:rayspin 26s linear infinite;}
+@keyframes rayspin{to{transform:rotate(360deg)}}
+.portrait.egypt .prays{background:repeating-conic-gradient(from 0deg at 50% 50%, rgba(255,214,130,.16) 0deg 5deg, transparent 5deg 16deg);}
+.portrait.greek .prays{background:repeating-conic-gradient(from 0deg at 50% 50%, rgba(150,190,255,.14) 0deg 5deg, transparent 5deg 16deg);}
+.portrait.norse .prays{background:repeating-conic-gradient(from 0deg at 50% 50%, rgba(170,240,225,.12) 0deg 5deg, transparent 5deg 16deg);}
+.plx .pglyph{font-size:46px;line-height:1;
+  filter:drop-shadow(0 3px 9px rgba(0,0,0,.75)) drop-shadow(0 0 14px rgba(255,255,255,.12));}
+.hand .plx .pglyph{font-size:36px;}
+#detail .plx .pglyph,.fighter .plx .pglyph{font-size:54px;}
+.pspark{position:absolute;inset:0;pointer-events:none;
+  background:
+   radial-gradient(1.6px 1.6px at 18% 28%, rgba(255,255,255,.95), transparent 70%),
+   radial-gradient(1.2px 1.2px at 72% 18%, rgba(255,255,255,.9), transparent 70%),
+   radial-gradient(1.8px 1.8px at 84% 62%, rgba(255,255,255,.95), transparent 70%),
+   radial-gradient(1.2px 1.2px at 38% 74%, rgba(255,255,255,.9), transparent 70%),
+   radial-gradient(1.5px 1.5px at 58% 38%, rgba(255,255,255,.95), transparent 70%);
+  animation:tw1 3.4s ease-in-out infinite;}
+.pspark.s2{background:
+   radial-gradient(1.4px 1.4px at 30% 52%, rgba(255,255,255,.9), transparent 70%),
+   radial-gradient(1.7px 1.7px at 64% 80%, rgba(255,255,255,.95), transparent 70%),
+   radial-gradient(1.2px 1.2px at 88% 38%, rgba(255,255,255,.9), transparent 70%),
+   radial-gradient(1.5px 1.5px at 12% 66%, rgba(255,255,255,.95), transparent 70%);
+  animation:tw2 4.1s ease-in-out infinite;}
+@keyframes tw1{0%,100%{opacity:.15}50%{opacity:.9}}
+@keyframes tw2{0%,100%{opacity:.85}50%{opacity:.2}}
+.pfoil{position:absolute;inset:-45%;pointer-events:none;mix-blend-mode:screen;opacity:.6;
+  background:
+   linear-gradient(115deg, transparent 42%, rgba(255,45,150,.22) 47%, rgba(64,224,255,.24) 51%, rgba(255,236,120,.20) 55%, transparent 60%),
+   conic-gradient(from 20deg at 50% 50%, rgba(255,0,120,.14), rgba(255,180,0,.10), rgba(0,220,255,.14), rgba(140,90,255,.14), rgba(255,0,120,.14));
+  animation:foilsweep 8s ease-in-out infinite;}
+@keyframes foilsweep{
+ 0%,100%{transform:translateX(-13%);filter:hue-rotate(-25deg);}
+ 50%{transform:translateX(13%);filter:hue-rotate(45deg);}}
+.card .pname{font-family:Georgia,serif;font-size:13px;font-weight:700;margin-top:2px;
+  letter-spacing:.4px;}
+.card .ppanth{font-size:9px;color:var(--ink-dim);letter-spacing:1.5px;text-transform:uppercase;}
+.card .prow{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:4px;}
+.card .ppow{font-size:19px;font-weight:800;color:var(--gold2);
+  width:34px;height:34px;border-radius:50%;border:2px solid var(--gold-dim);
+  display:flex;align-items:center;justify-content:center;background:#141b2e;}
+.card .ptrait{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:700;}
+.ptrait.W{background:#12325e;color:#a9cdf0;border:1px solid #3f6fb5;}
+.ptrait.C{background:#5e1a12;color:#ffb3a0;border:1px solid #b5432f;}
+.ptrait.K{background:#4a2a12;color:#f7dc8a;border:1px solid #a5762a;}
+.card .pab{font-size:10.5px;color:var(--ink-dim);margin-top:5px;line-height:1.4;min-height:30px;}
+.card .frame-glyph{position:absolute;top:4px;right:7px;font-size:12px;opacity:.75;}
+.card .patron-crown{position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+  font-size:22px;filter:drop-shadow(0 2px 4px #000);}
+/* hand grid */
+.hand{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0;}
+.hand .card{cursor:pointer;min-height:48px;}
+.hand .card.sel{outline:3px solid var(--gold2);outline-offset:2px;
+  box-shadow:0 0 20px rgba(232,182,76,.55);}
+.hand .card.spent{opacity:.32;filter:grayscale(.8);pointer-events:none;}
+.hand .card.spent::after{content:"FOUGHT";position:absolute;inset:auto 0 38% 0;text-align:center;
+  font-size:11px;font-weight:800;letter-spacing:2px;color:#fff;text-shadow:0 1px 3px #000;}
+.hand .card .pab{display:none;}
+/* detail panel */
+#detail{margin:10px 0;padding:10px;border:1px solid var(--gold-dim);border-radius:12px;
+  background:linear-gradient(180deg,#131a2e,#0a0f1c);display:none;}
+#detail.on{display:block;}
+#detail .dwrap{display:flex;gap:12px;align-items:stretch;}
+#detail .card{width:150px;flex:none;}
+#detail .card .pab{display:block;min-height:0;}
+#detail .dinfo{flex:1;display:flex;flex-direction:column;justify-content:center;}
+#detail .dtotal{font-size:13px;color:var(--ink-dim);margin-bottom:8px;line-height:1.5;}
+#detail .dtotal b{color:var(--gold2);font-size:20px;}
+/* enemy backs */
+.eback-row{display:flex;gap:6px;margin:6px 0;}
+.eback{flex:1;max-width:64px;aspect-ratio:3/4.4;border-radius:8px;
+  background:linear-gradient(160deg,#1a2340,#070b14);
+  border:2px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;
+  font-size:20px;color:var(--gold);}
+.eback.spent{opacity:.25;filter:grayscale(1);}
+.patron-mini{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-dim);
+  background:#0a0f1c;border:1px solid #2a3350;border-radius:10px;padding:6px 10px;margin:6px 0;}
+.patron-mini .pg{font-size:22px;}
+/* stage */
+#stage{margin:12px 0;min-height:230px;position:relative;}
+.fighters{display:flex;gap:10px;justify-content:center;align-items:stretch;}
+.fighter{flex:1;max-width:210px;}
+.fighter .who{text-align:center;font-size:11px;letter-spacing:2px;color:var(--ink-dim);
+  margin-bottom:6px;text-transform:uppercase;}
+.flip{perspective:900px;}
+.flip .card-in{transition:transform .55s;transform-style:preserve-3d;}
+.flip.facedown .card-in{transform:rotateY(90deg);}
+.vs{align-self:center;font-family:Georgia,serif;font-size:26px;color:var(--gold);
+  text-shadow:0 0 16px rgba(232,182,76,.6);}
+.totals{display:flex;gap:10px;justify-content:center;margin-top:8px;}
+.total-box{flex:1;max-width:210px;text-align:center;background:#0a0f1c;
+  border:1px solid #2a3350;border-radius:10px;padding:6px;}
+.total-box .tn{font-size:26px;font-weight:800;color:var(--gold2);}
+.total-box .tb{font-size:10.5px;color:var(--ink-dim);line-height:1.5;margin-top:2px;}
+.dmg-float{position:absolute;left:50%;top:34%;transform:translateX(-50%);
+  font-size:44px;font-weight:900;color:#ff6b6b;text-shadow:0 2px 10px #000,0 0 24px rgba(255,60,60,.6);
+  animation:floatup 1.3s ease-out forwards;pointer-events:none;z-index:5;}
+.dmg-float.heal{color:#7fe6a0;text-shadow:0 2px 10px #000,0 0 24px rgba(60,255,140,.5);}
+@keyframes floatup{0%{opacity:0;transform:translate(-50%,16px) scale(.7)}
+  15%{opacity:1;transform:translate(-50%,0) scale(1.12)}
+  30%{transform:translate(-50%,-6px) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-64px) scale(1)}}
+#roundmsg{text-align:center;font-family:Georgia,serif;font-size:19px;color:var(--gold2);
+  margin:10px 0;min-height:28px;}
+/* no-scroll arena layout: the whole match fits 100dvh */
+#scr-battle{position:relative;}
+#scr-battle.on{display:flex;flex-direction:column;height:100%;overflow:hidden;gap:5px;}
+.hudrow{display:flex;align-items:center;gap:8px;flex:none;}
+.hudrow .nm{font-family:Georgia,serif;font-size:12px;letter-spacing:1px;color:var(--gold2);white-space:nowrap;}
+.hudrow .nm.dim{color:var(--ink-dim);font-size:11px;}
+.hudrow .lifebar{flex:1;margin:0;height:22px;}
+.hudrow .lifebar .num{font-size:12px;}
+.eback-row{margin:0;flex:none;}
+.eback{max-width:44px;aspect-ratio:3/3.4;font-size:15px;border-width:1.5px;}
+.arena-strip.slim{margin:0;padding:5px 10px;gap:8px;flex:none;}
+.arena-strip.slim .ag{font-size:20px;}
+.arena-strip.slim .an{font-size:13px;}
+.arena-strip.slim .ad{display:none;}
+.bmid{display:flex;align-items:center;justify-content:center;gap:10px;flex:none;}
+.bmid .pips{margin:0;gap:5px;}
+.bmid .pip{width:24px;height:24px;font-size:10px;border-width:1.5px;}
+.bmid #roundmsg{margin:0;font-size:14px;min-height:0;}
+#stage{flex:1 1 auto;min-height:0;margin:0;overflow:hidden;position:relative;
+  display:flex;flex-direction:column;}
+#stage .fighters{flex:1 1 auto;min-height:0;align-items:center;}
+#stage .totals{flex:none;}
+#strike-zone{flex:none;}
+#stage .fighter .portrait{height:clamp(64px,13dvh,110px);}
+#stage .fighter .plx .pglyph{font-size:clamp(34px,7dvh,54px);}
+#stage .totals{margin-top:6px;}
+#stage .total-box{padding:4px;}
+#stage .total-box .tn{font-size:20px;}
+#roundsub{font-size:11.5px;color:var(--ink-dim);text-align:center;min-height:14px;}
+#roundsub{font-size:11.5px;color:var(--ink-dim);text-align:center;min-height:14px;}
+  text-overflow:ellipsis;min-height:17px;text-align:center;}
+#sight-zone:empty,#use-row:empty{display:none;}
+#sight-zone .sight-banner{margin:2px 0;padding:7px 10px;font-size:12px;}
+.use-row{margin:0;flex:none;}
+.use-row .btn{min-height:44px;font-size:13px;margin:0;}
+#detail{flex:none;margin:0;padding:8px;border:1px solid var(--gold-dim);border-radius:12px;
+  background:linear-gradient(180deg,#141b30,#0a0f1c);display:none;
+  box-shadow:0 10px 30px rgba(0,0,0,.7);}
+#detail.on{display:block;}
+#detail .dwrap{display:flex;gap:10px;align-items:stretch;}
+#detail .card{width:118px;flex:none;}
+#detail .card .pab{display:block;min-height:0;font-size:10px;}
+#detail .portrait{height:66px;}
+#detail .dinfo{flex:1;display:flex;flex-direction:column;justify-content:center;min-width:0;}
+#detail .dtotal{font-size:12px;color:var(--ink-dim);margin-bottom:6px;line-height:1.5;}
+#detail .dtotal b{color:var(--gold2);font-size:18px;}
+#detail .btn{min-height:48px;font-size:15px;margin:0;}
+.hand.battle{grid-template-columns:repeat(5,1fr);gap:6px;margin:0;flex:none;}
+.hand.battle .card{cursor:pointer;}
+.hand.battle .card-in{padding:6px 4px;}
+.hand.battle .portrait{height:52px;margin:0 0 3px;}
+.hand.battle .plx .pglyph{font-size:26px;}
+.hand.battle .pname{font-size:10px;margin-top:1px;}
+.hand.battle .ppanth{display:none;}
+.hand.battle .prow{gap:4px;margin-top:3px;}
+.hand.battle .ppow{width:26px;height:26px;font-size:14px;border-width:1.5px;}
+.hand.battle .ptrait{font-size:9px;padding:2px 6px;}
+.hand.battle .card .pab{display:none;}
+.hand.battle .frame-glyph{display:none;}
+.hand.battle .card.sel{outline:2px solid var(--gold2);outline-offset:1px;transform:translateY(-8px);
+  box-shadow:0 0 16px rgba(232,182,76,.55);}
+/* rendered god art inside the portrait, under the holo foil + parallax */
+.plx .pgod{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  animation:breathe 9s ease-in-out infinite;}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+.hand .card .patron-crown{font-size:16px;top:-9px;}
+.sight-banner{background:#101b33;border:1px solid #3f6fb5;border-radius:10px;padding:10px 12px;
+  margin:8px 0;font-size:13.5px;color:#a9cdf0;text-align:center;}
+.use-row{display:flex;gap:8px;margin:8px 0;}
+.use-row .btn{margin:0;}
+.sudden{border:2px solid var(--red);border-radius:12px;padding:12px;text-align:center;
+  margin:10px 0;background:#1c0b0e;animation:pulse 1.6s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 8px rgba(229,72,77,.3)}50%{box-shadow:0 0 26px rgba(229,72,77,.7)}}
+.sudden .st{font-family:Georgia,serif;font-size:22px;color:#ffb3b5;letter-spacing:2px;}
+.endtitle{font-family:Georgia,serif;font-size:52px;text-align:center;margin:30px 0 6px;
+  letter-spacing:3px;}
+.endtitle.win{background:linear-gradient(180deg,#fff3c4,var(--gold) 60%,#9a6f1e);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 0 40px rgba(232,182,76,.35);}
+.endtitle.lose{color:#8a93a8;text-shadow:0 0 30px rgba(120,130,160,.3);}
+.endflavor{text-align:center;font-family:Georgia,serif;font-style:italic;
+  color:var(--ink-dim);margin:0 0 18px;font-size:15px;}
+.endstats{text-align:center;font-size:14px;color:var(--ink-dim);margin-bottom:18px;line-height:1.9;}
+.endstats b{color:var(--gold2);}
+@media (prefers-reduced-motion:reduce){
+  #app.shake{animation:none;}
+  .flip .card-in{transition:none;}
+  .dmg-float{animation-duration:.01s;}
+  .sudden{animation:none;}
+  .portrait,.pfoil,.pspark,.prays{animation:none;}
+  .pfoil{opacity:.35;transform:none;}
+  .plx .pgod{animation:none;}
+  .hand.battle .card.sel{transform:none;}
+}
+
+/* --- Desktop (Tier 5 desktop-readiness): 1024px and up only. Phone CSS above untouched. --- */
+@media (min-width:1024px){
+  #app{max-width:880px;padding:14px 24px}
+  h1.title{font-size:56px}
+  .fighter{max-width:300px}
+  .total-box{max-width:300px}
+  .hand{gap:12px}
+  #detail .card{width:190px}
+}
+@media (min-width:1440px){
+  #app{max-width:1060px}
+  .fighter{max-width:340px}
+  .total-box{max-width:340px}
+}
+.rules-strip{max-width:520px;margin:16px auto 2px;text-align:left;font-size:13.5px;line-height:1.55;color:var(--ink-dim);border:1px solid rgba(212,175,55,.35);border-radius:12px;padding:10px 14px;}
+.rules-strip b{color:var(--gold2);}
+.rmsgwrap{display:flex;flex-direction:column;align-items:center;}
+</style>
+  <script data-goatcounter="https://georgestriderbuilds.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+<body>
+<canvas id="mkbg"></canvas>
+<div id="vignette"></div>
+<canvas id="burst"></canvas>
+<div id="app">
+
+  <section id="scr-start" class="on">
+    <h1 class="title">PANTHEON<br>CLASH</h1>
+    <p class="subtitle">Eighteen gods. Three pantheons. One arena.</p>
+    <button class="btn" id="btn-enter">Enter the Arena</button>
+    <div class="record" id="start-record"></div>
+    <div class="rules-strip">
+      <div><b>Five rounds.</b> Play one god each round. Higher Power wins; damage is the difference.</div>
+      <div><b>The triangle:</b> Wisdom outthinks Courage, Courage overwhelms Kindness, Kindness disarms Wisdom (+2).</div>
+      <div><b>Crown a patron</b> from your six gods: it sits out, but every god sharing its trait gains +1 Power all match.</div>
+    </div>
+    <details class="howto">
+      <summary>How to play</summary>
+      <ul>
+        <li>Your deck holds gods only. No magic cards. Ever.</li>
+        <li>Draw 6 gods. Crown one as your <b>patron</b>: it does not fight, but gods sharing its trait gain +1 Power all match.</li>
+        <li>Each match has an <b>arena</b>: Olympus favors Courage, Alexandria favors Wisdom, Elysian Fields favors Kindness (+1 Power, both sides).</li>
+        <li>Five rounds. Each round both sides play one god, revealed together.</li>
+        <li>The triangle: <b>Wisdom outthinks Courage, Courage overwhelms Kindness, Kindness disarms Wisdom</b> (+2 Power).</li>
+        <li>Higher total wins the round. Damage equals the difference. Ties wound both for 1.</li>
+        <li>Both sides have 25 life. At zero, the match ends. After five rounds, higher life wins. A tie means sudden death.</li>
+        <li>Every god has one ability. Read them. Use them. The gods reward the cunning.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section id="scr-patron">
+    <h1 class="title" style="font-size:30px;">CROWN YOUR PATRON</h1>
+    <p class="subtitle">Your patron does not fight. Gods sharing its trait gain +1 Power all match.</p>
+    <div class="hand" id="patron-hand"></div>
+    <p class="subtitle" id="patron-hint"></p>
+    <button class="btn" id="btn-crown" disabled>Crown your patron</button>
+  </section>
+
+  <section id="scr-arena">
+    <h1 class="title" style="font-size:30px;">THE ARENA</h1>
+    <div id="arena-reveal"></div>
+    <button class="btn" id="btn-towar">To War</button>
+  </section>
+
+  <section id="scr-battle">
+    <div class="hudrow"><span class="nm">RIVAL</span><span class="nm dim" id="foe-patron-lbl"></span>
+      <div class="lifebar foe"><div class="fill" id="foe-fill"></div><div class="num" id="foe-num">25</div></div></div>
+    <div class="eback-row" id="foe-hand"></div>
+    <div class="arena-strip slim" id="arena-strip"></div>
+    <div class="bmid"><div class="pips" id="pips"></div><div class="rmsgwrap"><div id="roundmsg"></div><div id="roundsub" aria-live="polite"></div></div></div>
+    <div id="stage"></div>
+    <div id="sight-zone"></div>
+    <div class="use-row" id="use-row"></div>
+    <div class="hudrow"><span class="nm">YOU</span><span class="nm dim" id="me-patron-lbl"></span><span class="nm dim" id="me-round-lbl">ROUND 1 OF 5</span>
+      <div class="lifebar me"><div class="fill" id="me-fill"></div><div class="num" id="me-num">25</div></div></div>
+    <div id="detail"></div>
+    <div class="hand battle" id="me-hand"></div>
+    <div style="display:none"><div id="foe-patron"></div><div id="me-patron"></div></div>
+  </section>
+
+  <section id="scr-end">
+    <div class="endtitle" id="end-title"></div>
+    <p class="endflavor" id="end-flavor"></p>
+    <div class="endstats" id="end-stats"></div>
+    <button class="btn" id="btn-rematch">Rematch</button>
+    <button class="btn ghost" id="btn-menu">Choose New Gods</button>
+  </section>
+
+</div>
+<script>
+/* ================= PANTHEON CLASH engine (pure logic, no DOM) =================
+   Judgment call, documented: the brief says "both sides draw 5," "name a patron
+   from its 5" that "does not fight," and "five rounds" of one god per round.
+   Four fighters cannot cover five rounds, so each side draws 6, crowns a patron
+   from the 6, and fights with the other 5. The undealt pool is therefore 6
+   (not 8); sudden death draws from it.
+   Anubis tie rule, documented: a tie involving exactly one Anubis counts as a
+   win for the Anubis side. The Anubis side takes 0 damage; the enemy takes 1.
+   (Reads as the weighing tipping, not a clash.) */
+'use strict';
+const GODS=[
+ {id:'ra',name:'Ra',pantheon:'egypt',glyph:'\u2600\uFE0F',power:7,trait:'W',ability:'noon',abilityText:'Noon: +1 for every round you have won.'},
+ {id:'isis',name:'Isis',pantheon:'egypt',glyph:'\uD83E\uDEBD',power:6,trait:'K',ability:'ward',abilityText:'Ward: the first round she would lose deals no damage.'},
+ {id:'osiris',name:'Osiris',pantheon:'egypt',glyph:'\u2697\uFE0F',power:6,trait:'K',ability:'underworld',abilityText:'Underworld: when defeated, restore 4 life.'},
+ {id:'anubis',name:'Anubis',pantheon:'egypt',glyph:'\uD83D\uDC3A',power:6,trait:'W',ability:'weighing',abilityText:'Weighing: rounds he plays that tie count as your win.'},
+ {id:'seth',name:'Seth',pantheon:'egypt',glyph:'\u26C8\uFE0F',power:8,trait:'C',ability:'chaos',abilityText:'Chaos: +2 while your life is lower.'},
+ {id:'horus',name:'Horus',pantheon:'egypt',glyph:'\uD83E\uDD85',power:7,trait:'C',ability:'falcon',abilityText:'Falcon Strike: +3 if played in round 1 or 2.'},
+ {id:'zeus',name:'Zeus',pantheon:'greek',glyph:'\u26A1',power:9,trait:'C',ability:'lightning',abilityText:'Lightning: +3 in round 1.'},
+ {id:'athena',name:'Athena',pantheon:'greek',glyph:'\uD83E\uDD89',power:7,trait:'W',ability:'strategy',abilityText:'Strategy: see the enemy trait before you pick, once per match.'},
+ {id:'ares',name:'Ares',pantheon:'greek',glyph:'\u2694\uFE0F',power:8,trait:'C',ability:'bloodlust',abilityText:'Bloodlust: +1 for every 5 damage you have dealt this match.'},
+ {id:'artemis',name:'Artemis',pantheon:'greek',glyph:'\uD83C\uDF19',power:6,trait:'W',ability:'moonshot',abilityText:'Moonshot: +2 if the enemy god\u2019s Power is higher.'},
+ {id:'hades',name:'Hades',pantheon:'greek',glyph:'\uD83D\uDC80',power:7,trait:'W',ability:'tithe',abilityText:'Tithe: +2 damage when he wins a round.'},
+ {id:'aphrodite',name:'Aphrodite',pantheon:'greek',glyph:'\uD83C\uDF39',power:5,trait:'K',ability:'charm',abilityText:'Charm: the enemy god loses its trait bonus this round.'},
+ {id:'odin',name:'Odin',pantheon:'norse',glyph:'\uD83D\uDC41\uFE0F',power:9,trait:'W',ability:'ravens',abilityText:'Ravens: see the enemy\u2019s Power before you pick, once per match.'},
+ {id:'thor',name:'Thor',pantheon:'norse',glyph:'\uD83D\uDD28',power:9,trait:'C',ability:'thunder',abilityText:'Thunder: +2 against Wisdom gods.'},
+ {id:'loki',name:'Loki',pantheon:'norse',glyph:'\uD83D\uDC0D',power:5,trait:'W',ability:'trickster',abilityText:'Trickster: swap your god after the reveal, once per match.'},
+ {id:'freya',name:'Freya',pantheon:'norse',glyph:'\uD83D\uDC08',power:7,trait:'K',ability:'falconcloak',abilityText:'Falcon Cloak: +2 while your life is lower.'},
+ {id:'tyr',name:'Tyr',pantheon:'norse',glyph:'\uD83D\uDDE1\uFE0F',power:8,trait:'C',ability:'onehand',abilityText:'One-Hand: +3 while your life is below 10.'},
+ {id:'baldur',name:'Baldur',pantheon:'norse',glyph:'\uD83C\uDF1F',power:7,trait:'K',ability:'beloved',abilityText:'Beloved: enemy defeat abilities do not trigger against him.'}
+];
+const ARENAS={
+ olympus:{name:'Olympus',trait:'C',glyph:'\u26F0\uFE0F',desc:'Courage gods gain +1 Power, both sides.'},
+ alexandria:{name:'Alexandria',trait:'W',glyph:'\uD83D\uDCDC',desc:'Wisdom gods gain +1 Power, both sides.'},
+ elysian:{name:'Elysian Fields',trait:'K',glyph:'\uD83C\uDF05',desc:'Kindness gods gain +1 Power, both sides.'}
+};
+const TRAIT_NAMES={W:'Wisdom',C:'Courage',K:'Kindness'};
+const TRAIT_GLYPHS={W:'\uD83D\uDC41\uFE0F',C:'\uD83D\uDD25',K:'\uD83D\uDC9B'};
+const PANTH_NAMES={egypt:'Egyptian',greek:'Greek',norse:'Norse'};
+const PANTH_GLYPHS={egypt:'\u2600',greek:'\u26A1',norse:'\u2744'};
+function beats(a,b){return (a==='W'&&b==='C')||(a==='C'&&b==='K')||(a==='K'&&b==='W');}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}return a;}
+/* me: {patronTrait, arena, life, foeLife, round, roundsWon, damageDealt} */
+function computeTotal(god,me,foeGod){
+ const brk=[];let t=god.power;
+ brk.push(['Power',god.power]);
+ if(me.patronTrait&&god.trait===me.patronTrait){t+=1;brk.push(['Patron',1]);}
+ if(ARENAS[me.arena]&&ARENAS[me.arena].trait===god.trait){t+=1;brk.push(['Arena',1]);}
+ let adv=0;
+ if(beats(god.trait,foeGod.trait))adv=2;
+ if(foeGod.ability==='charm')adv=0; /* Aphrodite's Charm negates the enemy trait bonus */
+ if(adv){t+=adv;brk.push(['Triangle',adv]);}
+ const ab=god.ability;let abBonus=0,abLabel=null;
+ if(ab==='noon'&&me.roundsWon>0){abBonus=me.roundsWon;abLabel='Noon';}
+ else if(ab==='chaos'&&me.life<me.foeLife){abBonus=2;abLabel='Chaos';}
+ else if(ab==='falcon'&&(me.round===1||me.round===2)){abBonus=3;abLabel='Falcon Strike';}
+ else if(ab==='lightning'&&me.round===1){abBonus=3;abLabel='Lightning';}
+ else if(ab==='bloodlust'){const b=Math.floor(me.damageDealt/5);if(b>0){abBonus=b;abLabel='Bloodlust';}}
+ else if(ab==='moonshot'&&foeGod.power>god.power){abBonus=2;abLabel='Moonshot';}
+ else if(ab==='thunder'&&foeGod.trait==='W'){abBonus=2;abLabel='Thunder';}
+ else if(ab==='falconcloak'&&me.life<me.foeLife){abBonus=2;abLabel='Falcon Cloak';}
+ else if(ab==='onehand'&&me.life<10){abBonus=3;abLabel='One-Hand';}
+ if(abBonus){t+=abBonus;brk.push([abLabel,abBonus]);}
+ return {total:t,brk:brk};
+}
+/* pMe/aMe: {patronTrait,arena,life,foeLife,round,roundsWon,damageDealt,wardUsed} */
+function resolveRound(pGod,aGod,pMe,aMe){
+ const P=computeTotal(pGod,pMe,aGod),A=computeTotal(aGod,aMe,pGod);
+ let winner,pDmg=0,aDmg=0;const events=[];
+ if(P.total===A.total){
+  const pW=pGod.ability==='weighing',aW=aGod.ability==='weighing';
+  if(pW&&!aW){winner='player';aDmg=1;events.push('weighing');}
+  else if(aW&&!pW){winner='ai';pDmg=1;events.push('weighing');}
+  else{winner='tie';pDmg=1;aDmg=1;events.push('clash');}
+ }else if(P.total>A.total){winner='player';aDmg=P.total-A.total;}
+ else{winner='ai';pDmg=A.total-P.total;}
+ if(winner==='player'&&pGod.ability==='tithe'){aDmg+=2;events.push('tithe');}
+ if(winner==='ai'&&aGod.ability==='tithe'){pDmg+=2;events.push('tithe');}
+ const pWonByBaldur=winner==='ai'&&aGod.ability==='beloved';
+ const aWonByBaldur=winner==='player'&&pGod.ability==='beloved';
+ let pHeal=0,aHeal=0;
+ if(winner==='ai'&&pGod.ability==='ward'&&!pMe.wardUsed&&!pWonByBaldur){pDmg=0;pMe.wardUsed=true;events.push('ward');}
+ if(winner==='player'&&aGod.ability==='ward'&&!aMe.wardUsed&&!aWonByBaldur){aDmg=0;aMe.wardUsed=true;events.push('ward');}
+ if(winner==='ai'&&pGod.ability==='underworld'&&!pWonByBaldur){pHeal=4;events.push('underworld');}
+ if(winner==='player'&&aGod.ability==='underworld'&&!aWonByBaldur){aHeal=4;events.push('underworld');}
+ return {pTotal:P.total,aTotal:A.total,pBrk:P.brk,aBrk:A.brk,winner:winner,
+  pDmg:pDmg,aDmg:aDmg,pHeal:pHeal,aHeal:aHeal,events:events};
+}
+function newMatch(){
+ const deck=shuffle(GODS.slice());
+ return {playerHand:deck.slice(0,6),aiHand:deck.slice(6,12),undealt:deck.slice(12),
+  playerLife:25,aiLife:25,playerPatron:null,aiPatron:null,
+  arena:['olympus','alexandria','elysian'][Math.floor(Math.random()*3)],
+  round:1,playerPlayed:[],aiPlayed:[],pRoundsWon:0,aRoundsWon:0,
+  pDamage:0,aDamage:0,pUsed:{},aUsed:{},pWard:false,aWard:false,
+  suddenDeath:false,over:false,winner:null};
+}
+function aiPatronPick(hand){
+ const c={W:0,C:0,K:0};hand.forEach(g=>c[g.trait]++);
+ let best='W';if(c.C>c[best])best='C';if(c.K>c[best])best='K';return best;
+}
+/* AI evaluates each candidate against the gods the player could still hold:
+   every god not in the AI hand and not already played by the player.
+   It never sees the player's current pick. */
+function aiEvaluate(g,aiMe,possible,pCtx){
+ let s=0;
+ for(const p of possible){
+  const G=computeTotal(g,aiMe,p).total;
+  const Q=computeTotal(p,pCtx,g).total;
+  s+=(G-Q);
+ }
+ return s/possible.length;
+}
+function aiPick(aiHand,possible,aiMe,pCtx){
+ let best=null,bestScore=-1e9,second=-1e9;
+ for(const g of aiHand){
+  const sc=aiEvaluate(g,aiMe,possible,pCtx)+Math.random()*2.5;
+  if(sc>bestScore){second=bestScore;bestScore=sc;best=g;}
+  else if(sc>second){second=sc;}
+ }
+ return {god:best,margin:bestScore-second};
+}
+/* AI answering a revealed player god (after fair sight, or Loki swap): best response. */
+function aiBestResponse(aiHand,pGod,aiMe,pCtx){
+ let best=null,bestScore=-1e9;
+ for(const g of aiHand){
+  const G=computeTotal(g,aiMe,pGod).total;
+  const Q=computeTotal(pGod,pCtx,g).total;
+  const sc=(G-Q)+Math.random()*1.5;
+  if(sc>bestScore){bestScore=sc;best=g;}
+ }
+ return best;
+}
+function aiWantsSight(aiHand,aUsed,margin){
+ const hasS=aiHand.some(g=>g.ability==='strategy'&&!aUsed.strategy);
+ const hasR=aiHand.some(g=>g.ability==='ravens'&&!aUsed.ravens);
+ if(margin>=2.5||Math.random()>0.65)return null;
+ if(hasS)return 'strategy';
+ if(hasR)return 'ravens';
+ return null;
+}
+/* localStorage persistence: migrate, never wipe */
+const LS={
+ get:function(k,d){try{const v=localStorage.getItem(k);if(v===null)return d;const n=parseInt(v,10);return isNaN(n)?d:n;}catch(e){return d;}},
+ set:function(k,v){try{localStorage.setItem(k,String(v));}catch(e){}}
+};
+function loadRecord(){return{wins:LS.get('pc-wins',0),losses:LS.get('pc-losses',0),streak:LS.get('pc-streak',0),best:LS.get('pc-best',0)};}
+function saveRecord(r){LS.set('pc-wins',r.wins);LS.set('pc-losses',r.losses);LS.set('pc-streak',r.streak);LS.set('pc-best',r.best);}
+</script>
+<script>
+/* ================= PANTHEON CLASH UI ================= */
+const $=id=>document.getElementById(id);
+const REDUCED=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* Tap-smoothness audit hardening: never fail silently. A visible toast beats a dead screen. */
+function toast(msg){
+ var old=document.querySelector('.err-toast');if(old&&old.parentNode)old.parentNode.removeChild(old);
+ var t=document.createElement('div');t.className='err-toast';t.textContent=msg;
+ (document.getElementById('app')||document.body).appendChild(t);
+ setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},3200);
+}
+window.addEventListener('error',function(e){
+ var m=(e&&(e.message||(e.error&&e.error.message)))||'unknown error';
+ toast('Hiccup: '+m+'. Tap again.');
+ if(window.console&&console.log)console.log('[pc] uncaught:',e);
+});
+let M=null,selId=null,aiLocked=null,aiSightPending=null,sightTrait=null,sightPower=null,phase='idle';
+let revP=null,revA=null,revPT=0,revAT=0,revPB=[],revAB=[],revToken=0;
+
+function show(id){document.querySelectorAll('#app section').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');window.scrollTo(0,0);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+
+/* ---------- holographic portrait parallax (2.5D tilt) ---------- */
+(function(){
+ if(REDUCED)return;
+ let raf=0,tx=0,ty=0,cur=null;
+ function apply(){
+  raf=0;
+  if(!cur||!document.contains(cur)){cur=null;return;}
+  const layers=cur.querySelectorAll('.plx');
+  for(let i=0;i<layers.length;i++){
+   const d=parseFloat(layers[i].getAttribute('data-d')||'0');
+   layers[i].style.transform='translate('+(tx*d).toFixed(1)+'px,'+(ty*d).toFixed(1)+'px)';
+  }
+ }
+ function reset(p){
+  const layers=p.querySelectorAll('.plx');
+  for(let i=0;i<layers.length;i++)layers[i].style.transform='';
+ }
+ const app=document.getElementById('app');
+ app.addEventListener('pointermove',function(e){
+  const p=e.target&&e.target.closest?e.target.closest('.portrait'):null;
+  if(!p)return;
+  const r=p.getBoundingClientRect();
+  tx=Math.max(-1,Math.min(1,((e.clientX-r.left)/r.width-.5)*2));
+  ty=Math.max(-1,Math.min(1,((e.clientY-r.top)/r.height-.5)*2));
+  if(cur&&cur!==p)reset(cur);
+  cur=p;
+  if(!raf)raf=requestAnimationFrame(apply);
+ },{passive:true});
+ app.addEventListener('pointerleave',function(){if(cur){reset(cur);cur=null;}},{passive:true});
+ document.addEventListener('pointerup',function(){if(cur){reset(cur);cur=null;}},{passive:true});
+ document.addEventListener('visibilitychange',function(){
+  if(document.hidden)document.querySelectorAll('.portrait').forEach(reset);
+ });
+})();
+
+function cardHTML(g,extra){
+ extra=extra||'';
+ return '<div class="card '+g.pantheon+'"><div class="card-in">'+
+ '<div class="frame-glyph">'+PANTH_GLYPHS[g.pantheon]+'</div>'+extra+
+ '<div class="portrait '+g.pantheon+'">'+
+ '<div class="plx" data-d="6"><div class="pback"></div></div>'+
+ '<div class="plx" data-d="3"><div class="prays"></div></div>'+
+ '<div class="plx" data-d="11"><div class="pglyph">'+g.glyph+'</div>'+
+ '<img class="pgod" src="gods/'+g.id+'.webp" alt="'+esc(g.name)+'" loading="lazy" draggable="false" onerror="this.remove()"></div>'+
+ '<div class="pspark s1"></div><div class="pspark s2"></div>'+
+ '<div class="pfoil"></div></div>'+
+ '<div class="pname">'+esc(g.name)+'</div>'+
+ '<div class="ppanth">'+PANTH_NAMES[g.pantheon]+'</div>'+
+ '<div class="prow"><div class="ppow">'+g.power+'</div>'+
+ '<div class="ptrait '+g.trait+'">'+TRAIT_GLYPHS[g.trait]+' '+TRAIT_NAMES[g.trait]+'</div></div>'+
+ '<div class="pab">'+esc(g.abilityText)+'</div></div></div>';
+}
+function pCtx(){return{patronTrait:M.playerPatron,arena:M.arena,life:M.playerLife,foeLife:M.aiLife,round:M.round,roundsWon:M.pRoundsWon,damageDealt:M.pDamage,wardUsed:M.pWard};}
+function aCtx(){return{patronTrait:M.aiPatron,arena:M.arena,life:M.aiLife,foeLife:M.playerLife,round:M.round,roundsWon:M.aRoundsWon,damageDealt:M.aDamage,wardUsed:M.aWard};}
+function possibleSet(){
+ return GODS.filter(g=>M.aiHand.indexOf(g)<0&&M.aiPlayed.indexOf(g)<0&&M.playerPlayed.indexOf(g)<0);
+}
+function log(html){$('roundsub').innerHTML=html;}
+function refreshBars(){
+ $('me-fill').style.width=Math.max(0,M.playerLife/25*100)+'%';
+ $('foe-fill').style.width=Math.max(0,M.aiLife/25*100)+'%';
+ $('me-num').textContent=Math.max(0,M.playerLife);
+ $('foe-num').textContent=Math.max(0,M.aiLife);
+}
+function renderPips(){
+ const el=$('pips');el.innerHTML='';
+ for(let i=0;i<5;i++){
+  const r=M.results[i];
+  const lbl=['I','II','III','IV','V'][i];
+  el.innerHTML+='<div class="pip '+(r==='w'?'w':r==='l'?'l':r==='t'?'t':'')+'">'+lbl+'</div>';
+ }
+}
+function renderArenaStrip(){
+ const a=ARENAS[M.arena],el=$('arena-strip');
+ el.className='arena-strip '+M.arena;
+ el.innerHTML='<div class="ag">'+a.glyph+'</div><div><div class="an">'+a.name+'</div><div class="ad">'+a.desc+'</div></div>';
+}
+function patronMini(elId,god,trait){
+ const el=$(elId);
+ el.innerHTML='<div class="pg">'+god.glyph+'</div><div><b style="color:var(--gold2)">'+esc(god.name)+'</b> watches over the '+TRAIT_NAMES[trait].toLowerCase()+' gods (+1 Power).</div>';
+}
+function renderFoeHand(){
+ const el=$('foe-hand');el.innerHTML='';
+ for(let i=0;i<M.aiHand.length;i++)el.innerHTML+='<div class="eback">\u2726</div>';
+ for(let i=0;i<M.aiPlayed.length;i++)el.innerHTML+='<div class="eback spent">\u2726</div>';
+}
+
+/* ---------- start / patron / arena ---------- */
+function renderStart(){
+ const r=loadRecord();
+ $('start-record').innerHTML='Record <b>'+r.wins+'-'+r.losses+'</b> &middot; Streak <b>'+r.streak+'</b> &middot; Best <b>'+r.best+'</b>';
+ show('scr-start');
+}
+function renderPatronScreen(){
+ selId=null;
+ const el=$('patron-hand');el.innerHTML='';
+ M.playerHand.forEach(g=>{
+  const d=document.createElement('div');d.innerHTML=cardHTML(g);
+  const c=d.firstChild;c.dataset.gid=g.id;
+  c.addEventListener('click',()=>{
+   selId=g.id;
+   el.querySelectorAll('.card').forEach(x=>x.classList.remove('sel'));
+   c.classList.add('sel');
+   const b=$('btn-crown');b.disabled=false;b.textContent='Crown '+g.name+' as Patron';
+  });
+  el.appendChild(c);
+ });
+ const counts={};M.playerHand.forEach(function(g){counts[g.trait]=(counts[g.trait]||0)+1;});
+ $('patron-hint').textContent='Your six: '+Object.keys(counts).map(function(k){return (TRAIT_NAMES[k]||k)+' \u00d7'+counts[k];}).join(' \u00b7 ')+'. Crown the trait you hold most of \u2014 it powers your whole match.';
+ const b=$('btn-crown');b.disabled=true;b.textContent='Crown your patron';
+ show('scr-patron');
+}
+function crownPatron(){
+ const g=M.playerHand.find(x=>x.id===selId);if(!g)return;
+ M.playerPatron=g.trait;M.playerPatronGod=g;
+ M.playerHand=M.playerHand.filter(x=>x.id!==g.id);
+ const at=aiPatronPick(M.aiHand);M.aiPatron=at;
+ const ag=M.aiHand.find(x=>x.trait===at);
+ M.aiPatronGod=ag;M.aiHand=M.aiHand.filter(x=>x.id!==ag.id);
+ const a=ARENAS[M.arena];
+ mkArena=M.arena;
+ $('arena-reveal').innerHTML='<div class="arena-strip '+M.arena+'" style="margin:18px 0;">'+
+  '<div class="ag" style="font-size:44px;">'+a.glyph+'</div>'+
+  '<div><div class="an" style="font-size:22px;">'+a.name+'</div><div class="ad">'+a.desc+'</div></div></div>'+
+  '<p class="subtitle">Your patron: '+esc(g.name)+' ('+TRAIT_NAMES[g.trait]+'). Rival patron: '+esc(ag.name)+' ('+TRAIT_NAMES[at]+').</p>';
+ show('scr-arena');
+}
+
+/* ---------- battle ---------- */
+function beginBattle(){
+ $('roundsub').innerHTML='';M.results=[];
+ renderArenaStrip();renderPips();refreshBars();renderFoeHand();
+ patronMini('me-patron',M.playerPatronGod,M.playerPatron);
+ patronMini('foe-patron',M.aiPatronGod,M.aiPatron);
+ $('foe-patron-lbl').textContent=TRAIT_GLYPHS[M.aiPatron]+' patron';
+ $('me-patron-lbl').textContent=TRAIT_GLYPHS[M.playerPatron]+' patron';
+ mkArena=M.arena;
+ show('scr-battle');
+ log('The arena is <b>'+ARENAS[M.arena].name+'</b>. '+esc(M.playerPatronGod.name)+' watches over you.');
+ startRound();
+}
+function startRound(){
+ phase='pick';selId=null;aiLocked=null;aiSightPending=null;sightTrait=null;sightPower=null;revP=null;revA=null;
+ $('stage').innerHTML='';$('detail').classList.remove('on');$('detail').innerHTML='';
+ $('sight-zone').innerHTML='';$('use-row').innerHTML='';
+ $('me-round-lbl').textContent=M.suddenDeath?'SUDDEN DEATH':'ROUND '+M.round+' OF 5';
+ $('roundmsg').textContent=M.suddenDeath?'':'Choose your god.';
+ renderHand();renderFoeHand();
+ if(M.suddenDeath){suddenDeathDraw();return;}
+ const preview=aiPick(M.aiHand,possibleSet(),aCtx(),pCtx());
+ const want=aiWantsSight(M.aiHand,M.aUsed,preview.margin);
+ if(want){
+  aiSightPending=want;
+  const nm=want==='strategy'?'Athena\u2019s Strategy':'Odin\u2019s Ravens';
+  $('sight-zone').innerHTML='<div class="sight-banner">The rival invokes <b>'+nm+'</b>. Lock in your god, it is watching.</div>';
+  log('Rival invokes <b>'+nm+'</b>.');
+ }
+ renderUseRow();
+}
+function renderUseRow(){
+ const el=$('use-row');el.innerHTML='';
+ if(phase!=='pick')return;
+ const mk=(god,label,fn)=>{
+  const b=document.createElement('button');b.className='btn small';b.textContent=label;
+  b.addEventListener('click',fn);el.appendChild(b);
+ };
+ const ath=M.playerHand.find(g=>g.ability==='strategy');
+ const odv=M.playerHand.find(g=>g.ability==='ravens');
+ if(ath&&!M.pUsed.strategy&&sightTrait==null)mk(ath,'Invoke Strategy: see rival trait',()=>playerUseSight('strategy'));
+ if(odv&&!M.pUsed.ravens&&sightPower==null)mk(odv,'Invoke Ravens: see rival power',()=>playerUseSight('ravens'));
+}
+function renderHand(){
+ const el=$('me-hand');el.innerHTML='';
+ M.playerHand.forEach(g=>{
+  const d=document.createElement('div');d.innerHTML=cardHTML(g);
+  const c=d.firstChild;c.dataset.gid=g.id;
+  if(g.id===selId)c.classList.add('sel');
+  c.addEventListener('click',()=>{
+   if(phase!=='pick')return;
+   if(selId===g.id){playerPick(g.id);return;}
+   selId=g.id;renderHand();showDetail(g);
+  });
+  el.appendChild(c);
+ });
+}
+function showDetail(g){
+ const d=$('detail');
+ let est=g.power;
+ if(M.playerPatron===g.trait)est+=1;
+ if(ARENAS[M.arena].trait===g.trait)est+=1;
+ d.innerHTML='<div class="dwrap">'+cardHTML(g)+
+  '<div class="dinfo"><div class="dtotal">Base <b>'+est+'</b> before the triangle and enemy.<br>'+esc(g.abilityText)+'</div>'+
+  '<button class="btn" id="btn-play">Play '+esc(g.name)+'</button></div></div>';
+ d.classList.add('on');
+ $('btn-play').addEventListener('click',()=>playerPick(g.id));
+}
+function removeFrom(hand,id){const i=hand.findIndex(g=>g.id===id);return i>=0?hand.splice(i,1)[0]:null;}
+function playerUseSight(kind){
+ const god=M.playerHand.find(g=>(kind==='strategy'?g.ability==='strategy':g.ability==='ravens'));
+ if(!god||M.pUsed[kind])return;
+ M.pUsed[kind]=true;
+ if(!aiLocked){
+  const pk=aiPick(M.aiHand,possibleSet(),aCtx(),pCtx());
+  aiLocked=removeFrom(M.aiHand,(pk.god||M.aiHand[0]).id);M.aiPlayed.push(aiLocked);
+ }
+ let msg;
+ if(kind==='strategy')sightTrait=TRAIT_NAMES[aiLocked.trait];else sightPower=aiLocked.power;
+ if(sightTrait!=null&&sightPower!=null)msg='Rival god revealed: <b>'+sightTrait+' trait, power '+sightPower+'</b>.';
+ else if(kind==='strategy')msg='Rival god revealed: <b>trait '+sightTrait+'</b>.';
+ else msg='Rival god revealed: <b>power '+sightPower+'</b>.';
+ $('sight-zone').innerHTML='<div class="sight-banner">'+msg+' Choose your answer.</div>';
+ log('You invoke <b>'+esc(god.name)+'\u2019s '+(kind==='strategy'?'Strategy':'Ravens')+'</b>.');
+ renderUseRow();renderFoeHand();
+}
+function playerPick(id){
+ try{
+ if(phase!=='pick'){toast('Not the pick phase right now.');return;}
+ const g=removeFrom(M.playerHand,id);if(!g){toast('That god is not in your hand.');return;}
+ M.playerPlayed.push(g);revP=g;
+ let aiGod;
+ if(aiLocked){aiGod=aiLocked;aiLocked=null;}
+ else if(aiSightPending){
+  aiGod=aiBestResponse(M.aiHand,g,aCtx(),pCtx())||M.aiHand[0];
+  removeFrom(M.aiHand,aiGod.id);M.aiPlayed.push(aiGod);
+  M.aUsed[aiSightPending]=true;
+  log('The rival answers your '+TRAIT_NAMES[g.trait].toLowerCase()+' god with knowledge.');
+  aiSightPending=null;
+ }else{
+  const pk=aiPick(M.aiHand,possibleSet(),aCtx(),pCtx());
+  aiGod=pk.god||M.aiHand[0];
+  removeFrom(M.aiHand,aiGod.id);M.aiPlayed.push(aiGod);
+ }
+ revA=aiGod;phase='reveal';
+ $('detail').classList.remove('on');$('use-row').innerHTML='';$('sight-zone').innerHTML='';
+ renderHand();renderFoeHand();revealPhase();
+ }catch(err){
+  toast('Play failed: '+((err&&err.message)||err));
+  if(window.console&&console.log)console.log('[pc] playerPick throw:',err);
+ }
+}
+function brkText(brk){
+ return brk.map(b=>b[0]+' +'+b[1]).join('  ');
+}
+function revealPhase(){
+ const tok=++revToken;
+ const st=$('stage');
+ st.innerHTML='<div class="fighters">'+
+  '<div class="fighter"><div class="who">You</div><div class="flip facedown" id="flipP">'+cardHTML(revP)+'</div></div>'+
+  '<div class="vs">VS</div>'+
+  '<div class="fighter"><div class="who">Rival</div><div class="flip facedown" id="flipA">'+cardHTML(revA)+'</div></div></div>'+
+  '<div class="totals" id="totals" style="visibility:hidden"></div>'+
+  '<div style="text-align:center;margin-top:10px" id="strike-zone"></div>';
+ setTimeout(()=>{
+  $('flipP').classList.remove('facedown');$('flipA').classList.remove('facedown');
+ },REDUCED?60:450);
+ setTimeout(()=>{
+  try{
+   computeReveal();
+   const t=$('totals');t.style.visibility='visible';
+   t.innerHTML='<div class="total-box"><div class="tn">'+revPT+'</div><div class="tb">'+esc(brkText(revPB))+'</div></div>'+
+    '<div class="total-box"><div class="tn">'+revAT+'</div><div class="tb">'+esc(brkText(revAB))+'</div></div>';
+   maybeLoki();
+  }catch(err){
+   toast('Reveal failed: '+((err&&err.message)||err));
+   if(window.console&&console.log)console.log('[pc] reveal throw:',err);
+  }
+ },REDUCED?120:1100);
+}
+function computeReveal(){
+ const P=computeTotal(revP,pCtx(),revA),A=computeTotal(revA,aCtx(),revP);
+ revPT=P.total;revAT=A.total;revPB=P.brk;revAB=A.brk;
+}
+function maybeLoki(){
+ const z=$('strike-zone');
+ const canP=M.playerHand.some(g=>g.ability==='trickster')&&!M.pUsed.trickster&&!M.suddenDeath;
+ const aiHasLoki=M.aiHand.some(g=>g.ability==='trickster')&&!M.aUsed.trickster&&!M.suddenDeath;
+ const aiLoses=revAT<revPT&&(revPT-revAT)<=3;
+ if(aiLoses&&aiHasLoki){
+  setTimeout(()=>{
+   try{
+    if(tok!==revToken||phase!=='reveal')return;
+    const loki=M.aiHand.find(g=>g.ability==='trickster');
+    if(!loki){showStrike();return;}
+    const alt=aiBestResponse(M.aiHand.filter(g=>g.id!==loki.id),revP,aCtx(),pCtx());
+    if(!alt){showStrike();return;}
+   const newT=computeTotal(alt,aCtx(),revP).total;
+   if(newT>revAT&&(newT>revPT||(newT===revPT&&alt.ability==='weighing'))){
+    M.aiHand.push(revA);M.aiPlayed=M.aiPlayed.filter(g=>g.id!==revA.id);
+    removeFrom(M.aiHand,alt.id);M.aiPlayed.push(alt);revA=alt;
+    M.aUsed.trickster=true;
+    log('The rival invokes <b>Trickster</b> and swaps in '+esc(alt.name)+'.');
+    $('roundmsg').textContent='The rival swaps gods.';
+    revealPhase();
+   }else{showStrike();}
+   }catch(err){
+    toast('Rival trick failed: '+((err&&err.message)||err));
+    if(window.console&&console.log)console.log('[pc] trickster throw:',err);
+    showStrike();
+   }
+  },REDUCED?100:800);
+  return;
+ }
+ if(canP){
+  const b=document.createElement('button');b.className='btn ghost small';
+  b.textContent='Invoke Trickster: swap your god';
+  b.addEventListener('click',playerLokiChoose);
+  z.appendChild(b);
+ }
+ showStrike();
+}
+function showStrike(){
+ if($('strike-zone').querySelector('#btn-strike'))return;
+ const b=document.createElement('button');b.className='btn';b.id='btn-strike';b.textContent='Strike';
+ b.addEventListener('click',resolveStrike);
+ $('strike-zone').appendChild(b);
+}
+function playerLokiChoose(){
+ const z=$('strike-zone');z.innerHTML='<div style="color:var(--ink-dim);font-size:13px;margin-bottom:8px;">Choose the replacement:</div>';
+ M.playerHand.filter(g=>g.ability!=='trickster'||true).forEach(g=>{
+  const b=document.createElement('button');b.className='btn ghost small';
+  b.textContent=g.glyph+' '+g.name+' ('+g.power+', '+TRAIT_NAMES[g.trait]+')';
+  b.addEventListener('click',()=>{
+   M.playerHand.push(revP);M.playerPlayed=M.playerPlayed.filter(x=>x.id!==revP.id);
+   removeFrom(M.playerHand,g.id);M.playerPlayed.push(g);revP=g;
+   M.pUsed.trickster=true;
+   log('You invoke <b>Trickster</b> and swap in '+esc(g.name)+'.');
+   revealPhase();
+  });
+  z.appendChild(b);
+ });
+}
+function floatDmg(txt,heal){
+ const s=document.createElement('div');s.className='dmg-float'+(heal?' heal':'');s.textContent=txt;
+ $('stage').appendChild(s);setTimeout(()=>s.remove(),1400);
+}
+function resolveStrike(){
+ if(phase!=='reveal')return;
+ phase='struck';
+ const pc=pCtx(),ac=aCtx();
+ const res=resolveRound(revP,revA,pc,ac);
+ M.pWard=pc.wardUsed;M.aWard=ac.wardUsed;
+ if(!M.suddenDeath){
+  M.playerLife=Math.min(25,M.playerLife-res.pDmg+res.pHeal);
+  M.aiLife=Math.min(25,M.aiLife-res.aDmg+res.aHeal);
+  M.pDamage+=res.aDmg;M.aDamage+=res.pDmg;
+  const w=res.winner;
+  M.results.push(w==='player'?'w':w==='ai'?'l':'t');
+  if(w==='player')M.pRoundsWon++;if(w==='ai')M.aRoundsWon++;
+ }
+ refreshBars();renderPips();
+ const big=Math.max(res.pDmg,res.aDmg);
+ if(big>=5&&!REDUCED){$('app').classList.remove('shake');void $('app').offsetWidth;$('app').classList.add('shake');}
+ const rmsg=$('roundmsg');
+ if(M.suddenDeath){
+  if(res.winner==='player'){rmsg.textContent=revP.name+' decides it.';endMatch('player');return;}
+  if(res.winner==='ai'){rmsg.textContent=revA.name+' decides it.';endMatch('ai');return;}
+  rmsg.textContent='The gods demand another.';
+  log('Sudden death: a tie. The gods demand another.');
+  const b=document.createElement('button');b.className='btn';b.textContent='Draw Again';
+  b.addEventListener('click',()=>{startRound();});
+  $('strike-zone').innerHTML='';$('strike-zone').appendChild(b);
+  return;
+ }
+ if(res.aDmg>0)floatDmg('-'+res.aDmg,false);
+ if(res.pDmg>0)setTimeout(()=>floatDmg('-'+res.pDmg,false),250);
+ if(res.pHeal>0)setTimeout(()=>floatDmg('+'+res.pHeal,true),500);
+ if(res.aHeal>0)setTimeout(()=>floatDmg('+'+res.aHeal,true),500);
+ let msg;
+ if(res.winner==='player')msg=revP.name+' prevails.';
+ else if(res.winner==='ai')msg=revA.name+' prevails.';
+ else msg='A clash. Both bleed.';
+ if(res.events.indexOf('ward')>=0)msg+=' Isis\u2019s Ward turns the blow.';
+ if(res.events.indexOf('underworld')>=0)msg+=' Osiris drinks from the underworld.';
+ if(res.events.indexOf('weighing')>=0)msg+=' Anubis tips the scales.';
+ rmsg.textContent=msg;
+ log('<b>'+esc(revP.name)+'</b> ('+revPT+') vs <b>'+esc(revA.name)+'</b> ('+revAT+'): '+
+  (res.winner==='tie'?'tie':res.winner==='player'?'you take the round':'rival takes the round')+
+  (res.aDmg?' \u2212'+res.aDmg+' rival':'' )+(res.pDmg?' \u2212'+res.pDmg+' you':'')+'.');
+ setTimeout(()=>{
+  if(M.playerLife<=0&&M.aiLife<=0){beginSuddenDeath('Both gods fall as one.');}
+  else if(M.playerLife<=0){endMatch('ai');}
+  else if(M.aiLife<=0){endMatch('player');}
+  else if(M.round>=5){
+   if(M.playerLife>M.aiLife)endMatch('player');
+   else if(M.aiLife>M.playerLife)endMatch('ai');
+   else beginSuddenDeath('Five rounds, and the gods are dead even.');
+  }else{
+   const b=document.createElement('button');b.className='btn';b.textContent='Round '+(M.round+1);
+   b.addEventListener('click',()=>{M.round++;startRound();});
+   $('strike-zone').innerHTML='';$('strike-zone').appendChild(b);
+  }
+ },REDUCED?200:1400);
+}
+function beginSuddenDeath(why){
+ M.suddenDeath=true;
+ log('<b>Sudden death.</b> '+esc(why));
+ startRound();
+}
+function suddenDeathDraw(){
+ if(M.undealt.length<2){
+  M.undealt=shuffle(GODS.filter(g=>M.playerHand.indexOf(g)<0&&M.aiHand.indexOf(g)<0&&g.id!==M.playerPatronGod.id&&g.id!==M.aiPatronGod.id));
+ }
+ const pg=M.undealt.pop(),ag=M.undealt.pop();
+ revP=pg;revA=ag;phase='reveal';
+ $('stage').innerHTML='<div class="sudden"><div class="st">SUDDEN DEATH</div>'+
+  '<div style="font-size:13px;color:var(--ink-dim);margin-top:4px;">One god each. One round decides everything.</div></div>'+
+  '<div class="fighters" style="margin-top:10px;">'+
+  '<div class="fighter"><div class="who">You</div>'+cardHTML(pg)+'</div>'+
+  '<div class="vs">VS</div>'+
+  '<div class="fighter"><div class="who">Rival</div>'+cardHTML(ag)+'</div></div>'+
+  '<div style="text-align:center;margin-top:10px" id="strike-zone"></div>';
+ log('Sudden death: you draw <b>'+esc(pg.name)+'</b>, the rival draws <b>'+esc(ag.name)+'</b>.');
+ computeReveal();
+ const b=document.createElement('button');b.className='btn';b.textContent='Decide It';
+ b.addEventListener('click',()=>{
+  $('strike-zone').innerHTML='';
+  const t=document.createElement('div');t.className='totals';
+  t.innerHTML='<div class="total-box"><div class="tn">'+revPT+'</div><div class="tb">'+esc(brkText(revPB))+'</div></div>'+
+   '<div class="total-box"><div class="tn">'+revAT+'</div><div class="tb">'+esc(brkText(revAB))+'</div></div>';
+  $('stage').appendChild(t);
+  setTimeout(()=>resolveStrike(),REDUCED?100:900);
+ });
+ $('strike-zone').appendChild(b);
+}
+
+/* ---------- end ---------- */
+function endMatch(winner){
+ M.over=true;M.winner=winner;phase='over';
+ const r=loadRecord();
+ if(winner==='player'){r.wins++;r.streak++;if(r.streak>r.best)r.best=r.streak;}
+ else{r.losses++;r.streak=0;}
+ saveRecord(r);
+ const t=$('end-title');
+ if(winner==='player'){
+  t.textContent='VICTORY';t.className='endtitle win';
+  $('end-flavor').textContent='The pantheons bow. Your name is spoken in every temple.';
+  if(!REDUCED)goldBurst();
+ }else{
+  t.textContent='DEFEAT';t.className='endtitle lose';
+  $('end-flavor').textContent='The gods are silent. Return stronger.';
+ }
+ $('end-stats').innerHTML='Final life: <b>'+Math.max(0,M.playerLife)+' vs '+Math.max(0,M.aiLife)+'</b><br>'+
+  'Record <b>'+r.wins+'-'+r.losses+'</b> &middot; Streak <b>'+r.streak+'</b> &middot; Best <b>'+r.best+'</b>';
+ log(winner==='player'?'<b>Victory.</b>':'<b>Defeat.</b>');
+ setTimeout(()=>show('scr-end'),REDUCED?100:1200);
+ if(winner!=='player')jsbFunRate('pantheon-clash', document.getElementById('scr-end'));
+}
+
+/* ---------- Mortal Kombat arena background (canvas 2D) ----------
+   2D canvas, phone-budgeted: drifting smoke, pooled rising embers,
+   per-arena dark stage silhouettes, floor sheen. Frozen when the tab
+   is hidden; a single static frame under prefers-reduced-motion. */
+let mkArena='olympus',mkRunning=false;
+function mkInit(){
+ const c=$('mkbg'),x=c.getContext('2d');let W,H;
+ function rs(){const d=Math.min(2,window.devicePixelRatio||1);
+  W=c.width=Math.floor(innerWidth*d);H=c.height=Math.floor(innerHeight*d);}
+ rs();addEventListener('resize',rs);
+ const embers=[];
+ for(let i=0;i<55;i++)embers.push({x:Math.random(),y:Math.random(),
+  s:Math.random()*.0016+.0006,r:Math.random()*2+.6,o:Math.random()*.6+.2,ph:Math.random()*7});
+ let flash=0,nextFlash=200,t=0;
+ function silhouettes(){
+  x.save();x.fillStyle='#000';x.strokeStyle='#000';x.globalAlpha=.55;
+  if(mkArena==='olympus'){
+   const cols=[[.05,.60,.11,.32],[.83,.56,.12,.36],[.66,.66,.07,.24]];
+   for(let i=0;i<cols.length;i++){const bx=cols[i][0]*W,by=cols[i][1]*H,bw=cols[i][2]*W,bh=cols[i][3]*H;
+    x.fillRect(bx,by,bw,bh);
+    x.beginPath();x.moveTo(bx,by);x.lineTo(bx+bw*.3,by-bh*.07);x.lineTo(bx+bw*.62,by);
+    x.lineTo(bx+bw*.82,by-bh*.05);x.lineTo(bx+bw,by);x.closePath();x.fill();}
+  }else if(mkArena==='alexandria'){
+   for(let i=0;i<3;i++){const sy=H*(.55+i*.13);x.globalAlpha=.5;x.fillRect(W*.07,sy,W*.86,H*.022);}
+   x.globalAlpha=.4;
+   for(let i=0;i<7;i++){const sx=W*(.12+i*.12),sy=H*(.50+((i*53)%28)/100);
+    x.fillRect(sx,sy,W*.05,H*.05);}
+  }else{
+   x.lineWidth=Math.max(2,W*.008);
+   const trees=[.14,.82];
+   for(let i=0;i<trees.length;i++){const bx=trees[i]*W,by=H*.96;
+    x.beginPath();x.moveTo(bx,by);x.lineTo(bx,by-H*.30);
+    x.moveTo(bx,by-H*.16);x.lineTo(bx-W*.06,by-H*.30);
+    x.moveTo(bx,by-H*.21);x.lineTo(bx+W*.05,by-H*.34);x.stroke();}
+  }
+  x.restore();
+ }
+ function draw(){
+  const g=x.createLinearGradient(0,0,0,H);
+  if(mkArena==='olympus'){g.addColorStop(0,'#0a1226');g.addColorStop(.62,'#060a14');g.addColorStop(1,'#02040a');}
+  else if(mkArena==='alexandria'){g.addColorStop(0,'#1d0e04');g.addColorStop(.62,'#0d0703');g.addColorStop(1,'#030201');}
+  else{g.addColorStop(0,'#220609');g.addColorStop(.62,'#0e0405');g.addColorStop(1,'#030102');}
+  x.fillStyle=g;x.fillRect(0,0,W,H);
+  for(let i=0;i<5;i++){
+   const sx=((t*.00012*(i+1))%1.4-.2)*W,sy=H*(.24+i*.15),r=W*(.26+((i*37)%22)/100);
+   const tint=mkArena==='elysian'?'120,32,32':(mkArena==='alexandria'?'90,50,26':'58,62,84');
+   const rg=x.createRadialGradient(sx,sy,0,sx,sy,r);
+   rg.addColorStop(0,'rgba('+tint+',.11)');rg.addColorStop(1,'rgba('+tint+',0)');
+   x.fillStyle=rg;x.fillRect(0,0,W,H);
+  }
+  silhouettes();
+  if(mkArena==='alexandria'){
+   for(let i=0;i<4;i++){const fx=W*(.2+i*.2),fy=H*(.52+((i*53)%30)/100);
+    const fl=.5+.5*Math.sin(t*.09+i*2.1);
+    const fg=x.createRadialGradient(fx,fy,0,fx,fy,W*.085);
+    fg.addColorStop(0,'rgba(255,'+Math.floor(118+82*fl)+',40,'+(.20+.15*fl).toFixed(3)+')');
+    fg.addColorStop(1,'rgba(255,80,20,0)');
+    x.fillStyle=fg;x.fillRect(0,0,W,H);}
+  }
+  if(mkArena==='olympus'){
+   if(flash>0){x.fillStyle='rgba(170,200,255,'+(flash*.004).toFixed(3)+')';x.fillRect(0,0,W,H);flash--;}
+   else if(t>nextFlash){flash=14;nextFlash=t+240+Math.random()*420;}
+  }
+  for(let i=0;i<embers.length;i++){const p=embers[i];
+   p.y-=p.s*(1+.4*Math.sin(t*.02+p.ph));p.x+=Math.sin(t*.015+p.ph)*.0004;
+   if(p.y<-.02){p.y=1.02;p.x=Math.random();}
+   const fl=.5+.5*Math.sin(t*.12+p.ph);
+   x.beginPath();x.arc(p.x*W,p.y*H,p.r,0,7);
+   x.fillStyle='rgba(255,'+Math.floor(140+80*fl)+',60,'+(p.o*(.35+.65*fl)).toFixed(3)+')';x.fill();
+  }
+  const sh=x.createLinearGradient(0,H*.82,0,H);
+  sh.addColorStop(0,'rgba(232,182,76,0)');sh.addColorStop(1,'rgba(232,182,76,.07)');
+  x.fillStyle=sh;x.fillRect(0,H*.82,W,H*.18);
+ }
+ function loop(){draw();t++;
+  if(!REDUCED&&!document.hidden)requestAnimationFrame(loop);else mkRunning=false;}
+ document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden&&!REDUCED&&!mkRunning){mkRunning=true;requestAnimationFrame(loop);}});
+ if(REDUCED){draw();}else{mkRunning=true;requestAnimationFrame(loop);}
+}
+function goldBurst(){
+ const c=$('burst'),x=c.getContext('2d');c.style.display='block';
+ c.width=innerWidth;c.height=innerHeight;
+ const ps=[];
+ for(let i=0;i<140;i++)ps.push({x:c.width/2,y:c.height/2,vx:(Math.random()-.5)*11,vy:Math.random()*-9-2,g:.28,
+  r:Math.random()*3.5+1.5,l:1,c:Math.random()<.7?'232,182,76':'247,220,138'});
+ let f=0;
+ (function loop(){
+  x.clearRect(0,0,c.width,c.height);f++;
+  for(const p of ps){p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.l-=.008;
+   x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fillStyle='rgba('+p.c+','+Math.max(0,p.l)+')';x.fill();}
+  if(f<220)requestAnimationFrame(loop);else c.style.display='none';
+ })();
+}
+
+/* ---------- wire up ---------- */
+$('btn-enter').addEventListener('click',()=>{M=newMatch();renderPatronScreen();});
+$('btn-crown').addEventListener('click',crownPatron);
+$('btn-towar').addEventListener('click',beginBattle);
+$('btn-rematch').addEventListener('click',()=>{M=newMatch();renderPatronScreen();});
+$('btn-menu').addEventListener('click',renderStart);
+mkInit();
+renderStart();
+</script>
+
+<script>
+/* fun-rating: 3 stars on game over, 3rd+ game over, once per session */
+function jsbFunRate(slug, mountEl){
+  if(!mountEl || mountEl.querySelector('.jsb-funrate')) return;
+  var K = 'jsb-fun-' + slug;
+  function ls(k, v){ try{ if(arguments.length===1) return localStorage.getItem(k); localStorage.setItem(k, v); }catch(e){ return null; } }
+  function ss(k, v){ try{ if(arguments.length===1) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); }catch(e){ return null; } }
+  var n = parseInt(ls(K+'-n')||'0', 10) + 1;
+  ls(K+'-n', String(n));
+  if(n < 3 || ss(K+'-s')) return;
+  ss(K+'-s', '1');
+  var box = document.createElement('div');
+  box.className = 'jsb-funrate';
+  box.innerHTML = '<div class="jsb-fr-q">fun?</div><div class="jsb-fr-stars">' +
+    '<button type="button" data-s="1" aria-label="not fun">\u2605</button>' +
+    '<button type="button" data-s="2" aria-label="ok">\u2605</button>' +
+    '<button type="button" data-s="3" aria-label="love it">\u2605</button></div>';
+  if(!document.getElementById('jsb-fr-css')){
+    var css = document.createElement('style'); css.id = 'jsb-fr-css';
+    css.textContent = '.jsb-funrate{margin:14px auto 4px;text-align:center;}' +
+      '.jsb-fr-q{font-size:12px;letter-spacing:.18em;opacity:.55;margin-bottom:6px;text-transform:uppercase;}' +
+      '.jsb-fr-stars{display:flex;gap:10px;justify-content:center;}' +
+      '.jsb-fr-stars button{background:none;border:none;font-size:34px;line-height:1;' +
+      'color:rgba(255,255,255,.22);cursor:pointer;min-width:52px;min-height:52px;padding:4px;}' +
+      '.jsb-fr-stars button:active{transform:scale(1.25);color:#2ee6a8;}' +
+      '.jsb-fr-thanks{font-size:13px;letter-spacing:.1em;opacity:.7;}';
+    document.head.appendChild(css);
+  }
+  mountEl.appendChild(box);
+  box.addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('button[data-s]') : null;
+    if(!b) return;
+    try{ if(window.goatcounter && window.goatcounter.count){
+      window.goatcounter.count({ path: '/event/fun/' + slug + '/' + b.getAttribute('data-s'), event: true });
+    }}catch(e2){}
+    box.innerHTML = '<div class="jsb-fr-thanks">thanks</div>';
+    setTimeout(function(){ if(box.parentNode) box.parentNode.removeChild(box); }, 1400);
+  });
+}
+</script>
+</body>
+</html>
